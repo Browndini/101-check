@@ -5,6 +5,10 @@
 /.pnp
 .pnp.js
 
+# custom
+/server/node_modules
+/public/img/*
+
 # testing
 /coverage
 

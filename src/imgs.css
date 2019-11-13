@@ -1,0 +1,13 @@
+.contain-img {
+  max-width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+.img-items {
+  width: 100px;
+  height: 100px;
+  background-size: cover;
+  margin: 10px 10px;
+}
