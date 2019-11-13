@@ -4,7 +4,8 @@ import './App.css';
 import './imgs.css';
 const sites = ['s101', 'f101', 'l101', 'h101', 'p101', 'v101', 'a101', 'tb'];
 
-
+// TODO: display all images
+// TODO: generate seperate site images
 class App extends React.Component {
   constructor(props) {
     super(props);
