@@ -48,18 +48,22 @@ body {
 
 .c {
   position: relative;
-  animation: wave 1s ease-in-out infinite ;
+  color:rebeccapurple;
+  animation: wave .7s ease-in-out infinite ;
 }
 
 .c-1 { animation-delay: 0ms }
 .c-2 { animation-delay: 200ms }
-.c-3 { animation-delay: 400ms }
+.c-3 { animation-delay: 440ms }
 
 @keyframes wave {
   50% {
-    top: -10px;
+    color: rgba(255, 255, 255, .8);
+    top: -3px;
   }
   0% , 100% {
+    color: rgb(47, 47, 47);
     top: 0px;
+
   }
 }

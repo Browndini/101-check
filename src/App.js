@@ -1,8 +1,22 @@
 import React from 'react';
 import ImgModal from './components/ImgModal';
+import DisplayImages from './components/DisplayImages';
+import GenButton from './components/GenButton';
 import './App.css';
 import './imgs.css';
-const sites = ['s101', 'f101', 'l101', 'h101', 'p101', 'v101', 'a101', 'tb'];
+const siteFiles = {
+  's101': { imgs:[] },
+  'f101': { imgs:[] },
+  'l101': { imgs:[] },
+  'h101': { imgs:[] },
+  'tb':   { imgs:[] },
+  'de':   { imgs:[] },
+  'ip':   { imgs:[] },
+  'p101': { imgs:[] },
+  'v101': { imgs:[] },
+  'a101': { imgs:[] },
+};
+const sites = Object.keys(siteFiles);
 
 // TODO: display all images
 // TODO: generate seperate site images
@@ -10,83 +24,70 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalIsOpen: false,
+      modalIsOpen: '',
       selectedIndex: 0,
-      files: [],
-      site: '',
-      generating: false,
+      siteFiles,
+      site: '',  
+      generating: '',
       doneGenerating: false,
     };
-    this.fetchImages();
+    sites.forEach(s => {
+      this.fetchImages(s);
+    })
   }
 
-  // generateImages = () => {
-  //   'http://localhost:3001/create/img/s101'
-  //   this.setState(state => ({ generating: !state.generating }));
-  // }
-
-  toggleModal = (selectedIndex) => {
-    this.setState(state => ({ modalIsOpen: !state.modalIsOpen, selectedIndex }));
+  toggleModal = (selectedIndex, site) => {
+    this.setState(state => ({ modalIsOpen: site, selectedIndex }));
   }
 
   fetchImages = async (site = 's101') => {
     const response = await fetch(`http://localhost:3001/img/${site}`);
     const myJson = await response.json();
-  
-    myJson.files = myJson.files.map(img => ({src: `/img/${myJson.site}/${img}`}));
-    this.setState(myJson);
+    let imgs = (myJson.files.length >= 0) ? myJson.files : [];
+
+    this.setState(state => ({
+      siteFiles: {
+        ...state.siteFiles,
+        [site]: {
+          imgs
+        }
+      }
+    }));
   }
 
-  generateImages = async () => {
-    this.setState(state => ({ generating: !state.generating }));
-    const response = await fetch('http://localhost:3001/create/img/s101');
+  generateImages = async (site) => {
+    this.setState(state => ({ generating: site }));
+    const response = await fetch(`http://localhost:3001/create/img/${site}`);
     const myJson = await response.json();
     if(!myJson.done) return true;
-    await this.fetchImages();
-    this.setState(state => ({ generating: !state.generating, doneGenerating: myJson.done }));
+    await this.fetchImages(site);
+    this.setState(state => ({ generating: 'done', doneGenerating: site }));
     setTimeout(() => {
-      this.setState(state => ({ doneGenerating: false }));
+      this.setState(state => ({ generating: '', doneGenerating: false }));
     }, 2000);
   }
+  
 
   render() {
-    const { modalIsOpen, selectedIndex, files, generating, doneGenerating } = this.state;
+    const { modalIsOpen, selectedIndex, siteFiles, generating, doneGenerating } = this.state;
     let toggleModal = this.toggleModal;
+    let generateImages = this.generateImages;
 
     return (
       <div className="App App-header">
-        {sites.map(site =>
-          (<div className='cool'>
-            <h3>{site}</h3>
-            <div className='contain-img'>
-              {files.map((item, num) => {
-                let bgImageStyle = { backgroundImage: `url(${item.src})` };
-                return <div key={num} className='img-items' style={bgImageStyle} onClick={() => toggleModal(num)} ></div>;
-              })}
-            </div>
-            <div className='lower-section'>
-              <div className='button' onClick={() => this.generateImages()}>
-                {generating ? (<span>Generating<span class="c c-1">.</span><span class="c c-2">.</span><span class="c c-3">.</span></span>) : (doneGenerating ? 'Done!' : 'Generate')}
+        {sites.map(site => {
+          let files = siteFiles[site].imgs;
+          return (
+            <div className='section' key={site}>
+              <h3>{site}</h3>
+              <DisplayImages props={{files, site, toggleModal}} />
+              <div className='lower-section'>
+                <GenButton props={{ generating, site, doneGenerating, generateImages }} />
               </div>
+              <ImgModal props={{ selectedIndex, modalIsOpen, toggleModal, files, site }} />
             </div>
-          </div>)
-        )}
-      {/* <div className='cool'>
-        <h3>{site}</h3>
-        <div className='contain-img'>
-          {files.map((item, num) => {
-            let bgImageStyle = { backgroundImage: `url(${item.src})` };
-            return <div key={num} className='img-items' style={bgImageStyle} onClick={() => toggleModal(num)} ></div>;
-          })}
-        </div>
-        <div className='lower-section'>
-          <div className='button' onClick={() => this.generateImages()}>
-            {generating ? (<span>Generating<span class="c c-1">.</span><span class="c c-2">.</span><span class="c c-3">.</span></span>) : (doneGenerating ? 'Done!' : 'Generate')}
-          </div>
-        </div>
-      </div> */}
-
-        <ImgModal props={{selectedIndex, modalIsOpen, toggleModal, files}} />
+          );
+        })}
       </div>
     );
   }

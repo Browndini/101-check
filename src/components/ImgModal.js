@@ -1,12 +1,12 @@
 import React from 'react';
 import Carousel, { Modal, ModalGateway } from 'react-images';
 
-function ImgModal(props) {
-  let {selectedIndex, modalIsOpen, toggleModal, files } = props.props;
+const ImgModal = (data) => {
+  let { selectedIndex, modalIsOpen, toggleModal, files, site } = data.props;
 
   return (
     <ModalGateway>
-      {modalIsOpen ? (
+      {modalIsOpen === site ? (
         <Modal onClose={toggleModal}>
           <Carousel views={files} currentIndex={selectedIndex} />
         </Modal>
