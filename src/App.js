@@ -4,17 +4,22 @@ import DisplayImages from './components/DisplayImages';
 import GenButton from './components/GenButton';
 import './App.css';
 import './imgs.css';
+const base = {
+  imgs: [],
+  generating: '',
+  doneGenerating: false,
+};
 const siteFiles = {
-  's101': { imgs:[] },
-  'f101': { imgs:[] },
-  'l101': { imgs:[] },
-  'h101': { imgs:[] },
-  'tb':   { imgs:[] },
-  'de':   { imgs:[] },
-  'ip':   { imgs:[] },
-  'p101': { imgs:[] },
-  'v101': { imgs:[] },
-  'a101': { imgs:[] },
+  s101: base,
+  f101: base,
+  l101: base,
+  h101: base,
+  tb:   base,
+  de:   base,
+  ip:   base,
+  a101: base,
+  p101: base,
+  v101: base,
 };
 const sites = Object.keys(siteFiles);
 
@@ -31,9 +36,13 @@ class App extends React.Component {
       generating: '',
       doneGenerating: false,
     };
+  }
+
+  componentDidMount() {
     sites.forEach(s => {
       this.fetchImages(s);
     })
+    
   }
 
   toggleModal = (selectedIndex, site) => {

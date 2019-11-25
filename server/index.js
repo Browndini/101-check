@@ -1,13 +1,20 @@
+const locationID = 'kb-img',
+  projectId = 'novelty-1281',
+  keyFilename = './config.json';
+
 const express = require("express");
 const fs = require("fs");
+const tinify = require("tinify");
 const cors = require('cors');
 const app = express();
 const puppeteer = require('puppeteer');
 const { Storage } = require('@google-cloud/storage');
-const storage = new Storage({
-  projectId: 'novelty-1281',
-  keyFilename: "./config.json"
-});
+const storage = new Storage({ projectId, keyFilename });
+const bucket = storage.bucket(locationID);
+const getPublicUrl = (fileName) => ({ src: `https://storage.googleapis.com/${locationID}/${decodeURIComponent(fileName)}` });
+
+tinify.key = "Zw80Q3kV6YByLshNw1JdWbl8CBWQyRTd";
+
 
 let experiences = {
   desktop: {
@@ -65,6 +72,20 @@ let siteTests = {
     newnext2: 'https://www.finance101.com/meal-kit/2?utm_content=newnext&utm_source=talas&cool'
   }
 };
+
+// TODO: convert to use this data structure
+let sample = {
+  f101: {
+    url: 'https://www.finance101.com/',
+    contentTypes: ['newnext', 'feed'],
+    sourceTypes: ['talas', 'ouins', 'faok'],
+    other: ['cool=1'],
+    pagination: [
+      { newnext: ['1', '2'] },
+    ],
+  }
+};
+
 const sites = Object.keys(siteTests);
 
 app.set("port", process.env.PORT || 3001);
@@ -75,62 +96,103 @@ if (process.env.NODE_ENV !== "production") {
 
 app.get("/create/img/:item", async (req, res) => {
   let found = sites.find(site => site === req.params.item.toLowerCase()) || 's101';
-  await sss(found);
+  const tinyCount = tinify.compressionCount;
+  await sss(found, tinyCount);
   res.json({done: true});
 })
 
 app.get("/img/:item", async (req, res) => {
-  let found = sites.find(site => site === req.params.item.toLowerCase());
+  let site = sites.find(site => site === req.params.item.toLowerCase());
   let prefix = req.params.item.toLowerCase();
-  let [files] = await storage.bucket('kb-img').getFiles({prefix});
-  let items = files.map(s => ({ src: s.metadata.mediaLink }));
+  let [items] = await bucket.getFiles({prefix});
+  let files = items.map(s => getPublicUrl(s.id)) || [];
 
-  res.json({
-    files: items || [],
-    site: req.params.item.toLowerCase()
-  });
+  res.json({ files, site });
 });
-
 
 app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
 
-async function sss(site) {
+async function sss(site, tinyCount) {
   // for (var site in siteTests) {
     for (var layout in siteTests[site]) {
       let layoutUrl = siteTests[site][layout];
 
       for (var device in experiences) {
         for (var size in experiences[device]) {
-          let fileName = `../public/img/${site}/${layout}-${device}-${size}.png`;
+          const imgName = `${layout}-${device}-${size}.png`;
+          const fileName = `../public/img/${site}/${imgName}`;
           const iPhone = puppeteer.devices['iPhone 6'];
           const browser = await puppeteer.launch();
           const context = await browser.createIncognitoBrowserContext();
           const page = await context.newPage();
-          console.log(`creating image: ${fileName}`);
-
-          if(device === 'mobile') {
-            await page.emulate(iPhone);
-            await page.goto(layoutUrl);
-            await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
-          }
-          
-          else {
-            await page.setViewport(experiences[device][size]);
-            await page.goto(layoutUrl);
-            if (layout !== 'newnext2') {
-              await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
-            } else {
-              await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
+          // console.log(`creating image: ${fileName}`);
+          try {
+            if (device === 'mobile') {
+              await page.emulate(iPhone);
+              await page.goto(layoutUrl);
+              await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
             }
-            if (size !== 'small') {
-              await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
+            
+            else {
+              await page.setViewport(experiences[device][size]);
+              await page.goto(layoutUrl);
+              if (layout !== 'newnext2') {
+                await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
+              } else {
+                await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
+              }
+              if (size !== 'small') {
+                await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
+              }
             }
+          } catch(e) {
+            console.log('>>>>>> failed to wait for ads after 2 sec <<<<<<');
           }
 
           await page.waitFor(3000);
           await page.screenshot({path: fileName, fullPage: true});
+
+          console.log('tiny count: ', tinyCount);
+          if(tinyCount && tinyCount <= 400) {
+            console.log('makin more: ', tinyCount);
+            let makeTiny = await tinify.fromFile(fileName);
+            await makeTiny.toFile(fileName);
+          }
+
+          const file = bucket.file(`${site}/${imgName}`);
+          fs.createReadStream(fileName)
+          .pipe(file.createWriteStream())
+          .on('error', function(err) {
+            console.log('woooo error....');
+          })
+          .on('finish', function() {
+            console.log('uploaded image: ',fileName);
+          });
+
+          // console.log('img', image);
+          // const file = bucket.file('image');
+          // console.log( 'before...');
+          // const stream = file.createWriteStream({
+          //   metadata: {
+          //     contentType: 'image/png'
+          //   },
+          //   public: true,
+          //   resumable: false
+          // });
+          // // console.log(stream);
+          // stream.on('error', (err) => {
+          //   console.log('faoled there...');
+          // });
+          // stream.on('finish', () => {
+          //   console.log('up there...');
+          //   // req.file.cloudStorageObject = gcsname;
+          //   // file.makePublic().then(() => {
+          //     // req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
+          //     // next();
+          //   // });
+          // });
           await browser.close();
         }
       }

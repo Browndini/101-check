@@ -10,7 +10,8 @@
     "express": "4.13.3",
     "fs": "0.0.2",
     "puppeteer": "^2.0.0",
-    "sql.js": "0.3.2"
+    "sql.js": "0.3.2",
+    "tinify": "^1.6.0-beta.2"
   },
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
