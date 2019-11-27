@@ -4,17 +4,17 @@ const locationID = 'kb-img',
 
 const express = require("express");
 const fs = require("fs");
-const tinify = require("tinify");
+const imagemin = require('imagemin');
+const imageminPngquant = require('imagemin-pngquant');
+const imageminPngcrush = require('imagemin-pngcrush');
+
 const cors = require('cors');
 const app = express();
 const puppeteer = require('puppeteer');
 const { Storage } = require('@google-cloud/storage');
 const storage = new Storage({ projectId, keyFilename });
 const bucket = storage.bucket(locationID);
-const getPublicUrl = (fileName) => ({ src: `https://storage.googleapis.com/${locationID}/${decodeURIComponent(fileName)}` });
-
-tinify.key = "Zw80Q3kV6YByLshNw1JdWbl8CBWQyRTd";
-
+const getPublicUrl = (src) => ({ src });
 
 let experiences = {
   desktop: {
@@ -68,8 +68,8 @@ let siteTests = {
     newnext2: 'https://www.tiebreaker.com/nba-celebrity-fans/2?utm_content=newnext&utm_source=talas&cool'
   },
   f101: {
-    newnext: 'https://www.finance101.com/meal-kit/?utm_content=newnext&utm_source=talas&cool',
-    newnext2: 'https://www.finance101.com/meal-kit/2?utm_content=newnext&utm_source=talas&cool'
+    newnext: 'https://www.finance101.com/retire-abroad-cheap/?utm_content=newnext&utm_source=talas&cool',
+    newnext2: 'https://www.finance101.com/retire-abroad-cheap/2?utm_content=newnext&utm_source=talas&cool'
   }
 };
 
@@ -96,8 +96,8 @@ if (process.env.NODE_ENV !== "production") {
 
 app.get("/create/img/:item", async (req, res) => {
   let found = sites.find(site => site === req.params.item.toLowerCase()) || 's101';
-  const tinyCount = tinify.compressionCount;
-  await sss(found, tinyCount);
+
+  await siteCheck(found);
   res.json({done: true});
 })
 
@@ -105,7 +105,7 @@ app.get("/img/:item", async (req, res) => {
   let site = sites.find(site => site === req.params.item.toLowerCase());
   let prefix = req.params.item.toLowerCase();
   let [items] = await bucket.getFiles({prefix});
-  let files = items.map(s => getPublicUrl(s.id)) || [];
+  let files = items.map(s => getPublicUrl(s.metadata.mediaLink)) || [];
 
   res.json({ files, site });
 });
@@ -114,88 +114,73 @@ app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
 
-async function sss(site, tinyCount) {
-  // for (var site in siteTests) {
-    for (var layout in siteTests[site]) {
-      let layoutUrl = siteTests[site][layout];
+async function siteCheck(site) {
+  for (var layout in siteTests[site]) {
+    let layoutUrl = siteTests[site][layout];
 
-      for (var device in experiences) {
-        for (var size in experiences[device]) {
-          const imgName = `${layout}-${device}-${size}.png`;
-          const fileName = `../public/img/${site}/${imgName}`;
-          const iPhone = puppeteer.devices['iPhone 6'];
-          const browser = await puppeteer.launch();
-          const context = await browser.createIncognitoBrowserContext();
-          const page = await context.newPage();
-          // console.log(`creating image: ${fileName}`);
-          try {
-            if (device === 'mobile') {
-              await page.emulate(iPhone);
-              await page.goto(layoutUrl);
-              await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
-            }
-            
-            else {
-              await page.setViewport(experiences[device][size]);
-              await page.goto(layoutUrl);
-              if (layout !== 'newnext2') {
-                await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
-              } else {
-                await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
-              }
-              if (size !== 'small') {
-                await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
-              }
-            }
-          } catch(e) {
-            console.log('>>>>>> failed to wait for ads after 2 sec <<<<<<');
+    for (var device in experiences) {
+      for (var size in experiences[device]) {
+        const imgName = `${layout}-${device}-${size}.png`;
+        const filePath = `../public/img/${site}`;
+        const fileName = `${filePath}/${imgName}`;
+        const iPhone = puppeteer.devices['iPhone 6'];
+        const browser = await puppeteer.launch();
+        const context = await browser.createIncognitoBrowserContext();
+        const page = await context.newPage();
+        // console.log(`creating image: ${fileName}`);
+        try {
+          if (device === 'mobile') {
+            await page.emulate(iPhone);
+            await page.goto(layoutUrl);
+            await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
           }
-
-          await page.waitFor(3000);
-          await page.screenshot({path: fileName, fullPage: true});
-
-          console.log('tiny count: ', tinyCount);
-          if(tinyCount && tinyCount <= 400) {
-            console.log('makin more: ', tinyCount);
-            let makeTiny = await tinify.fromFile(fileName);
-            await makeTiny.toFile(fileName);
+          
+          else {
+            await page.setViewport(experiences[device][size]);
+            await page.goto(layoutUrl);
+            if (layout !== 'newnext2') {
+              await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
+            } else {
+              await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
+            }
+            if (size !== 'small') {
+              await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
+            }
           }
-
-          const file = bucket.file(`${site}/${imgName}`);
-          fs.createReadStream(fileName)
-          .pipe(file.createWriteStream())
-          .on('error', function(err) {
-            console.log('woooo error....');
-          })
-          .on('finish', function() {
-            console.log('uploaded image: ',fileName);
-          });
-
-          // console.log('img', image);
-          // const file = bucket.file('image');
-          // console.log( 'before...');
-          // const stream = file.createWriteStream({
-          //   metadata: {
-          //     contentType: 'image/png'
-          //   },
-          //   public: true,
-          //   resumable: false
-          // });
-          // // console.log(stream);
-          // stream.on('error', (err) => {
-          //   console.log('faoled there...');
-          // });
-          // stream.on('finish', () => {
-          //   console.log('up there...');
-          //   // req.file.cloudStorageObject = gcsname;
-          //   // file.makePublic().then(() => {
-          //     // req.file.cloudStoragePublicUrl = getPublicUrl(gcsname);
-          //     // next();
-          //   // });
-          // });
-          await browser.close();
+        } catch(e) {
+          console.log('>>>>>> failed to wait for ads after 2 sec <<<<<<');
         }
+
+        await page.waitFor(3000);
+        await page.screenshot({path: fileName, fullPage: true});
+
+
+        imagemin([fileName], {
+          destination: filePath,
+          plugins: [
+            imageminPngquant({
+              quality: [0.6, 0.8]
+            })
+          ]
+        })
+        .finally(() => {
+          sendImage({fileName, site, imgName});
+        })
+
+        await browser.close();
       }
-    // }
+    }
   }
+}
+
+function sendImage({fileName, site, imgName}) {
+  const file = bucket.file(`${site}/${imgName}`);
+  fs.createReadStream(fileName)
+  .pipe(file.createWriteStream())
+  .on('error', function(err) {
+    console.log('woooo error....');
+  })
+  .on('finish', function() {
+    console.log('uploaded image: ',fileName);
+  });
 }
