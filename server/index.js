@@ -2,18 +2,25 @@ const locationID = 'kb-img',
   projectId = 'novelty-1281',
   keyFilename = './config.json';
 
+
+
+
+const base = require("./base");
+
+console.log(base.sites());
+
 const express = require("express");
 const fs = require("fs");
 const imagemin = require('imagemin');
 const imageminPngquant = require('imagemin-pngquant');
-const imageminPngcrush = require('imagemin-pngcrush');
-
 const cors = require('cors');
 const app = express();
 const puppeteer = require('puppeteer');
 const { Storage } = require('@google-cloud/storage');
+
 const storage = new Storage({ projectId, keyFilename });
 const bucket = storage.bucket(locationID);
+
 const getPublicUrl = (src) => ({ src });
 
 let experiences = {
@@ -75,15 +82,19 @@ let siteTests = {
 
 // TODO: convert to use this data structure
 let sample = {
-  f101: {
-    url: 'https://www.finance101.com/',
-    contentTypes: ['newnext', 'feed'],
-    sourceTypes: ['talas', 'ouins', 'faok'],
-    other: ['cool=1'],
-    pagination: [
-      { newnext: ['1', '2'] },
+  "f101": {
+    "url": "https://www.finance101.com",
+    "stories": [
+      "celeb-chefs-who-cooked-up-million-dollar-empires",
+      "baby-costs"
     ],
-  }
+    "contentTypes": ["newnext", "feed"],
+    "sourceTypes": ["talas", "ouins", "faok"],
+    "other": ["cool=1"],
+    "pagination": [
+      { "newnext": ["1", "2"] }
+    ]
+  },
 };
 
 const sites = Object.keys(siteTests);
@@ -115,62 +126,71 @@ app.listen(app.get("port"), () => {
 });
 
 async function siteCheck(site) {
-  for (var layout in siteTests[site]) {
-    let layoutUrl = siteTests[site][layout];
+  // console.log(s());
+  // siteObjects[site].stories.map((story) => {
+  //   let baseUrl = `${siteObjects[site]}/${story}/`;
+  // });
 
-    for (var device in experiences) {
-      for (var size in experiences[device]) {
-        const imgName = `${layout}-${device}-${size}.png`;
-        const filePath = `../public/img/${site}`;
-        const fileName = `${filePath}/${imgName}`;
-        const iPhone = puppeteer.devices['iPhone 6'];
-        const browser = await puppeteer.launch();
-        const context = await browser.createIncognitoBrowserContext();
-        const page = await context.newPage();
-        // console.log(`creating image: ${fileName}`);
-        try {
-          if (device === 'mobile') {
-            await page.emulate(iPhone);
-            await page.goto(layoutUrl);
-            await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
-          }
+  // for (var layout in siteTests[site]) {
+  //   let layoutUrl = siteTests[site][layout];
+
+  //   for (var device in experiences) {
+  //     for (var size in experiences[device]) {
+  //       const imgName = `${layout}-${device}-${size}.png`;
+  //       const filePath = `../public/img/${site}`;
+  //       const fileName = `${filePath}/${imgName}`;
+  //       const iPhone = puppeteer.devices['iPhone 6'];
+  //       const browser = await puppeteer.launch();
+  //       const context = await browser.createIncognitoBrowserContext();
+  //       const page = await context.newPage();
+  //       // console.log(`creating image: ${fileName}`);
+  //       try {
+  //         if (device === 'mobile') {
+  //           await page.emulate(iPhone);
+  //           await page.goto(layoutUrl);
+  //           await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
+  //         }
           
-          else {
-            await page.setViewport(experiences[device][size]);
-            await page.goto(layoutUrl);
-            if (layout !== 'newnext2') {
-              await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
-            } else {
-              await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
-            }
-            if (size !== 'small') {
-              await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
-            }
-          }
-        } catch(e) {
-          console.log('>>>>>> failed to wait for ads after 2 sec <<<<<<');
-        }
+  //         else {
+  //           await page.setViewport(experiences[device][size]);
+  //           await page.goto(layoutUrl);
+  //           if (layout !== 'newnext2') {
+  //             await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
+  //           } else {
+  //             await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
+  //           }
+  //           if (size !== 'small') {
+  //             await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
+  //           }
+  //         }
+  //       } catch(e) {
+  //         console.log('>>>>>> failed to wait for ads after 2 sec <<<<<<');
+  //       }
 
-        await page.waitFor(3000);
-        await page.screenshot({path: fileName, fullPage: true});
+  //       await page.waitFor(3000);
+  //       await page.screenshot({path: fileName, fullPage: true});
 
 
-        imagemin([fileName], {
-          destination: filePath,
-          plugins: [
-            imageminPngquant({
-              quality: [0.6, 0.8]
-            })
-          ]
-        })
-        .finally(() => {
-          sendImage({fileName, site, imgName});
-        })
+  //       imagemin([fileName], {
+  //         destination: filePath,
+  //         plugins: [
+  //           imageminPngquant({
+  //             quality: [0.6, 0.8]
+  //           })
+  //         ]
+  //       })
+  //       .finally(() => {
+  //         sendImage({fileName, site, imgName});
+  //       })
 
-        await browser.close();
-      }
-    }
-  }
+  //       await browser.close();
+  //     }
+  //   }
+  // }
+}
+
+function storyRender(story, index) {
+
 }
 
 function sendImage({fileName, site, imgName}) {
