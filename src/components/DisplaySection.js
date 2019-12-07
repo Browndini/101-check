@@ -15,8 +15,9 @@ class DisplaySection extends React.Component {
     this.fetchImages(props.props.site);
   }
 
+  // its on google cloud
   fetchImages = async (site = 's101') => {
-    const response = await fetch(`http://localhost:3001/img/${site}`);
+    const response = await fetch(`https://us-central1-novelty-1281.cloudfunctions.net/check-1/${site}`);
     const myJson = await response.json();
     let imgs = (myJson.files.length >= 0) ? myJson.files : [];
 
