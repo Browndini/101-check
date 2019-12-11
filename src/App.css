@@ -67,3 +67,18 @@ body {
 
   }
 }
+
+.unfocus {
+  display: flex;
+  height: 95vh;
+  width: 80vw;
+}
+
+.unfocus:focus{
+  outline: none;
+}
+
+.modalImage {
+  object-fit: contain;
+  width: 100%;
+}

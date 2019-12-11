@@ -1,17 +1,22 @@
 import React from 'react';
-import Carousel, { Modal, ModalGateway } from 'react-images';
+import Modal from '@material-ui/core/Modal';
+
 
 
 const ImgModal = ({ props: { toggleModal, open } }) => {
 
   return (
-    <ModalGateway>
-      {open ? (
-        <Modal onClose={() => {toggleModal(false)}}>
-          <Carousel views={open} />
-        </Modal>
-      ) : null}
-    </ModalGateway>
+    <Modal
+      aria-labelledby="spring-modal-title"
+      aria-describedby="spring-modal-description"
+      open={!!open}
+      onClose={() => toggleModal()}
+      style={{ 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}}
+    >
+      <div className={'unfocus'}>
+      <img className={'modalImage'} src={open && open[0].src} />
+      </div>
+    </Modal>
   );
 
 }

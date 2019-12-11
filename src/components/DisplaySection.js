@@ -10,7 +10,7 @@ class DisplaySection extends React.Component {
       generating: '',
       doneGenerating: false
     };
-    console.log('display section: ',this.state);
+    // console.log('display section: ',this.state);
 
     this.fetchImages(props.props.site);
   }

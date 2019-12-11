@@ -1,0 +1,23 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/storage": "^4.1.2",
+    "fs": "0.0.2",
+    "imagemin": "^7.0.1",
+    "imagemin-pngquant": "^8.0.0",
+    "puppeteer": "^2.0.0",
+    "sql.js": "0.3.2"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node index.js",
+    "client": "node start-client.js",
+    "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1",
+    "lint": "eslint ."
+  },
+  "author": "",
+  "license": "ISC"
+}

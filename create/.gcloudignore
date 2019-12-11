@@ -1,0 +1,6 @@
+.gcloudignore
+.git
+.gitignore
+.DS_Store
+config.json
+node_modules
