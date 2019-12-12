@@ -14,8 +14,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy-img-get": "cd server && gcloud functions deploy check-1 --runtime nodejs8",
-    "deploy-img-create": "cd create && gcloud functions deploy create-101-imgs --runtime nodejs8"
+    "deploy-img-get": "cd getImg && gcloud functions deploy check-1",
+    "deploy-img-create": "cd create && gcloud functions deploy create-101-imgs"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -31,8 +31,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^2.1.1"
   }
 }
