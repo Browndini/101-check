@@ -1,18 +1,13 @@
 import React from 'react';
-
-// import PropTypes from 'prop-types';
-// import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import Modal from '@material-ui/core/Modal';
 
 import ImgModal from './components/ImgModal';
 import DisplaySection from './components/DisplaySection';
-import './App.css';
-import './imgs.css';
+import './Home.css';
+
 const base = {
   imgs: [],
   generating: '',
@@ -31,81 +26,51 @@ const siteFiles = {
   v101: base,
 };
 const sites = Object.keys(siteFiles);
-// const [value, setValue] = React.useState(0);
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
       siteFiles,
+      value: 0
     };
-    
   }
 
   toggleModal = (item = false) => {
     this.setState(state => ({ open: item }));
   }
 
-
-  handleChange = (event, newValue) => {
-    // setValue(newValue);
-  };
   render() {
-    const value = 0;
-    const setValue =  ()  => {};
-    const { siteFiles, open } = this.state;
-    let toggleModal = this.toggleModal;
-    console.log('rendered',open, !!open);
-
+    const { siteFiles, open, value } = this.state;
+    const toggleModal = this.toggleModal;
 
     return (
-      <div className="App App-header">
-      <AppBar position="static">
+      <div style={{"display":"flex", "flexGrow": "1", "width": "100vw", "height": "100vh"}}>
         <Tabs
-          variant="fullWidth"
+          orientation="vertical"
+          variant="scrollable"
           value={value}
-          onChange={this.handleChange}
-          aria-label="nav tabs example"
+          onChange={(event, newValue) => {this.setState(state => ({ value: newValue }))}}
+          aria-label="Vertical tabs example"
+          style={{ "borderRight": "solid black 1px" , "background": "#94A89A"}}
         >
-          <LinkTab label="Page One" href="/drafts" {...a11yProps(0)} />
-          <LinkTab label="Page Two" href="/trash" {...a11yProps(1)} />
-          <LinkTab label="Page Three" href="/spam" {...a11yProps(2)} />
+          {sites.map((site, index) => <Tab key={site} label={`${site}`} id={`vertical-tab-${index}`} />)}
         </Tabs>
-      </AppBar>
-      <TabPanel value={value} index={0}>
-        {sites.map(site => <DisplaySection key={site} props={{siteFiles, site, toggleModal}} />)}
 
-        <ImgModal props={{ toggleModal, open }} />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        Page Two
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        Page Three
-      </TabPanel>
+        {sites.map((site, index) => {
+          return (
+            <TabPanel key={site} value={value} index={index}>
+              <DisplaySection key={site} props={{siteFiles, site, toggleModal}} />
 
+              <ImgModal props={{ toggleModal, open }} />
+            </TabPanel>
+          );
+          
+        })}
       </div>
     );
   }
-}
-
-function LinkTab(props) {
-  return (
-    <Tab
-      component="a"
-      onClick={event => {
-        event.preventDefault();
-      }}
-      {...props}
-    />
-  );
-}
-
-function a11yProps(index) {
-  return {
-    id: `nav-tab-${index}`,
-    'aria-controls': `nav-tabpanel-${index}`,
-  };
 }
 
 function TabPanel(props) {
@@ -116,8 +81,8 @@ function TabPanel(props) {
       component="div"
       role="tabpanel"
       hidden={value !== index}
-      id={`nav-tabpanel-${index}`}
-      aria-labelledby={`nav-tab-${index}`}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
       {value === index && <Box p={3}>{children}</Box>}

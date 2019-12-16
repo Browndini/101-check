@@ -1,27 +1,6 @@
 body {
-  background: #282c34;
-}
-
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-}
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #09d3ac;
+  background: #6d7b8b;
+  overflow: hidden;
 }
 
 .lower-section {
@@ -32,16 +11,16 @@ body {
 }
 
 .button {
-  background: #22655c;
-  padding: 0px 20px 4px;
-  transition: .4s;
+  background: #94a89a;
+  padding: 3px 20px 4px;
   font-size: .9em;
+  letter-spacing: .09em;
+  transition: .4s;
 }
 
 .button:hover {
-  background: #27756b;
-  padding: 0px 20px 4px;
-  box-shadow: 2px 2px 2px #585858;
+  background: #abc1b2;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.33);
   cursor: pointer;
   transition: .4s;
 }
@@ -49,7 +28,7 @@ body {
 .c {
   position: relative;
   color:rebeccapurple;
-  animation: wave .7s ease-in-out infinite ;
+  animation: wave .7s ease-in-out infinite;
 }
 
 .c-1 { animation-delay: 0ms }
@@ -64,7 +43,6 @@ body {
   0% , 100% {
     color: rgb(47, 47, 47);
     top: 0px;
-
   }
 }
 
@@ -82,3 +60,27 @@ body {
   object-fit: contain;
   width: 100%;
 }
+
+
+/* changes to material UI - START */
+.MuiTypography-root {
+  width: calc(100% - 160px);
+  overflow: scroll;
+}
+
+.MuiTabs-indicator {
+  width: 4px!important;
+  background-color: #F7DD72!important;
+}
+
+.MuiPaper-root {
+  width: 300px;
+  margin: 0 20px 30px;
+}
+
+@media only screen and (max-width: 600px) {
+  .MuiTypography-root {
+    width: calc(100% - 72px);
+  }
+} 
+/* changes to material UI - END */

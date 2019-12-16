@@ -33,9 +33,33 @@ class DisplaySection extends React.Component {
 
   generateImages = async (site) => {
     this.setState(state => ({ generating: site }));
-    const response = await fetch(`http://localhost:3001/create/img/${site}`);
-    const myJson = await response.json();
-    if(!myJson.done) return true;
+    let ss = [];
+    ['large', 'small', 'medium'].forEach(size => {
+      ['newnext', 'newnext2'].forEach(layout => {
+        ['mobile', 'desktop'].forEach(device => {
+          if ( size === 'small' && device === 'mobile') {
+            ss.push(fetch(`https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs/${site}/${device}/iphone/${layout}`))
+          } else if (device !== 'mobile') {
+            ss.push(fetch(`https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs/${site}/${device}/${size}/${layout}`));
+          }
+        });
+      });
+    });
+
+    let final = false;
+    await Promise.all(ss)
+      .then(e=> e)
+      .then(responses => Promise.all(responses.map(r => r.json())))
+      .then(data => {
+        let m = data.findIndex(s => s.done === false);
+        if(m >= 0) {
+          final = data[m];
+        }
+      }).catch(e => {
+        console.log('woooo',e);
+      })
+      console.log('wo yeah ',final);
+
     await this.fetchImages(site);
     this.setState(state => ({ generating: 'done', doneGenerating: site }));
     setTimeout(() => {

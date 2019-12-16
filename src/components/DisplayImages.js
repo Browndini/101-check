@@ -1,4 +1,5 @@
 import React from 'react';
+import './DisplayImages/imgs.css';
 
 const DisplayImages = ({ props }) => {
   let { files, toggleModal } = props;

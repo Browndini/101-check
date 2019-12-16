@@ -1,10 +1,7 @@
 import React from 'react';
 import Modal from '@material-ui/core/Modal';
 
-
-
 const ImgModal = ({ props: { toggleModal, open } }) => {
-
   return (
     <Modal
       aria-labelledby="spring-modal-title"
@@ -14,11 +11,10 @@ const ImgModal = ({ props: { toggleModal, open } }) => {
       style={{ 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}}
     >
       <div className={'unfocus'}>
-      <img className={'modalImage'} src={open && open[0].src} />
+      <img className={'modalImage'} alt={'site layout'} src={open && open[0].src} />
       </div>
     </Modal>
   );
-
 }
 
 export default ImgModal;

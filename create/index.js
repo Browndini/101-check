@@ -5,6 +5,8 @@
 // change to -> const storage = new Storage({ projectId, keyFilename });
 // finally run -> `npm start`
 
+// changing wait times, 9 min is the max timeout
+
 const locationID = 'kb-img';
 const projectId = 'novelty-1281';
 
@@ -39,26 +41,31 @@ async function siteCheck({site, device, size, layout}) {
     if (device === 'mobile') {
       await page.emulate(iPhone);
       await page.goto(layoutUrl);
+      await page.waitFor(1000);
       await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
-    }
-    
-    else {
+    } else {
       await page.setViewport(experiences[device][size]);
       await page.goto(layoutUrl);
-      if (layout !== 'newnext2') {
-        await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 2000 });
-      } else {
-        await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 2000 });
-      }
-      if (size !== 'small') {
-        await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
+      await page.waitFor(1000);
+
+      switch(size) {
+        case 'large':
+          await page.waitFor(() => !!document.querySelector('#rect-top-right-1 > div'), { timeout: 1000 });
+          await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 1000 });
+        case 'small':
+        case 'medium':
+        default:
+          if (layout === 'newnext2') {
+            await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 1000 });
+          } else {
+            await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 1000 });
+          }
+          break;
       }
     }
   } catch(e) {
     return false;
   }
-
-  await page.waitFor(2000);
 
   const file = bucket.file(`${site}/${imgName}`);
   const image = await page.screenshot({ fullPage: true });
