@@ -1,13 +1,13 @@
 import React from 'react';
 import Modal from '@material-ui/core/Modal';
 
-const ImgModal = ({ props: { toggleModal, open } }) => {
+const ImgModal = ({ props: { setOpen, open } }) => {
   return (
     <Modal
       aria-labelledby="spring-modal-title"
       aria-describedby="spring-modal-description"
       open={!!open}
-      onClose={() => toggleModal()}
+      onClose={() => setOpen(false)}
       style={{ 'display': 'flex', 'alignItems': 'center', 'justifyContent': 'center'}}
     >
       <div className={'unfocus'}>

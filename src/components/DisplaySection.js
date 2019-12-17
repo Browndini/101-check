@@ -20,15 +20,12 @@ class DisplaySection extends React.Component {
     const response = await fetch(`https://us-central1-novelty-1281.cloudfunctions.net/check-1/${site}`);
     const myJson = await response.json();
     let imgs = (myJson.files.length >= 0) ? myJson.files : [];
+    let updateFiles = {
+      ...this.state.allSiteFiles,
+      [site]: { ...this.state.allSiteFiles[site], imgs }
+    };
 
-    this.setState(state => ({
-      siteFiles: {
-        ...state.siteFiles,
-        [site]: {
-          imgs
-        }
-      }
-    }));
+    this.state.addImgs(this.state.setAllSiteFiles, updateFiles);
   }
 
   generateImages = async (site) => {
@@ -68,9 +65,9 @@ class DisplaySection extends React.Component {
   }
 
   render() {
-    let { siteFiles, site, toggleModal, doneGenerating, generating } = this.state;
+    let { allSiteFiles, site, toggleModal, doneGenerating, generating } = this.state;
     let generateImages = this.generateImages;
-    let files = siteFiles[site].imgs;
+    let files = allSiteFiles[site].imgs;
 
     return (
       <div className='section' key={site}>
@@ -83,18 +80,5 @@ class DisplaySection extends React.Component {
     );
   }
 }
-
-// {
-//   let files = siteFiles[site].imgs;
-//   return (
-//     <div className='section' key={site}>
-//       <h3>{site}</h3>
-//       <DisplayImages props={{files, site, toggleModal}} />
-//       <div className='lower-section'>
-//         <GenButton props={{ generating, site, doneGenerating, generateImages }} />
-//       </div>
-//     </div>
-//   );
-// }
 
 export default DisplaySection;
