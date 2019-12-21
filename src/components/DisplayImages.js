@@ -1,9 +1,7 @@
 import React from 'react';
 import './DisplayImages/imgs.css';
 
-const DisplayImages = ({ props }) => {
-  let { files, toggleModal, setOpen } = props;
-
+const DisplayImages = ({ props: { files, setOpen } }) => {
   return (
     <div className='contain-img'>
       {files.map((item, num) => {

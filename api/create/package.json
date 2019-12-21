@@ -6,6 +6,7 @@
   "dependencies": {
     "@google-cloud/functions-framework": "^1.3.2",
     "@google-cloud/storage": "^4.1.2",
+    "express": "^4.17.1",
     "imagemin": "^7.0.1",
     "imagemin-pngquant": "^8.0.0",
     "puppeteer": "^2.0.0"
@@ -15,7 +16,7 @@
     "client": "node start-client.js",
     "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1",
     "lint": "eslint .",
-    "start": "functions-framework --target=helloWorld"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC"

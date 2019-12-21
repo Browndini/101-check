@@ -7,9 +7,11 @@
 
 // changing wait times, 9 min is the max timeout
 
+// gcloud app deploy --version 20191218t155353 --no-promote app.yaml
+
 const locationID = 'kb-img';
 const projectId = 'novelty-1281';
-
+const keyFilename = './config.json'
 const { experiences, siteTests } = require('./img-config');
 
 const imagemin = require('imagemin');
@@ -17,27 +19,42 @@ const imageminPngquant = require('imagemin-pngquant');
 
 const puppeteer = require('puppeteer');
 const { Storage } = require('@google-cloud/storage');
-const storage = new Storage({ projectId });
+const storage = new Storage({ projectId, keyFilename });
 const bucket = storage.bucket(locationID);
 
-exports.helloWorld = async (req, res) => {
-  const [site, device, size, layout] = req.params[0].substring(1).toLowerCase().split('/');
-  const done = await siteCheck({site, device, size, layout});
+const express = require('express');
+const app = express();
+const port = 8080;
 
+app.get('/:site/:device/:size/:layout', async (req, res) => {
+  
+  const data = req.params;
+  const created = await siteCheck(data);
+  // const created = {cool:'yup'};
+
+  res.type('application/json');
   res.set('Access-Control-Allow-Origin', "*");
-  res.json({done: !!done, site, device, size, layout, created: !!done && done});
-};
+  if(typeof created === 'object') {
+    res.json({data, ...created});
+  } else {
+    res.json({data, ...created});
+  }
+})
+
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
 
 async function siteCheck({site, device, size, layout}) {
   const layoutUrl = siteTests[site][layout];
   const imgName = `${layout}-${device}-${size}.png`;
 
-  const iPhone = puppeteer.devices['iPhone 6'];
-  const browser = await puppeteer.launch({args: ['--no-sandbox']});
-  const context = await browser.createIncognitoBrowserContext();
-  const page = await context.newPage();
-
+  
   try {
+    const iPhone = puppeteer.devices['iPhone 6'];
+    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
+    const context = await browser.createIncognitoBrowserContext();
+    const page = await context.newPage();
+
     if (device === 'mobile') {
       await page.emulate(iPhone);
       await page.goto(layoutUrl);
@@ -63,23 +80,23 @@ async function siteCheck({site, device, size, layout}) {
           break;
       }
     }
-  } catch(e) {
-    return false;
-  }
 
-  const file = bucket.file(`${site}/${imgName}`);
-  const image = await page.screenshot({ fullPage: true });
-  const imageCompressed = await imagemin.buffer(image, {
-    plugins: [
-      imageminPngquant({
-        quality: [0.6, 0.8]
-      })
-    ]
-  });
-
-
-  await file.save(imageCompressed);
-  await browser.close();
+    const file = bucket.file(`${site}/${imgName}`);
+    const image = await page.screenshot({ fullPage: true });
+    const imageCompressed = await imagemin.buffer(image, {
+      plugins: [
+        imageminPngquant({
+          quality: [0.6, 0.8]
+        })
+      ]
+    });
   
-  return `${site}/${imgName}`;
+  
+    await file.save(imageCompressed);
+    await browser.close();
+    
+    return { created: `${site}/${imgName}`, done: true };
+  } catch(error) {
+    return { error, done: false };
+  }
 }

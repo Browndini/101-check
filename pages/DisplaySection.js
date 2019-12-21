@@ -1,7 +1,9 @@
 import React,  { useState, useEffect } from 'react';
+import fetch from 'isomorphic-unfetch';
 import DisplayImages from './DisplayImages';
 import GenButton from './GenButton';
-import ImgModal from './ImgModal';
+
+// import ImgModal from './ImgModal';
 
   const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase) => {
     setGenerating(site);
@@ -65,7 +67,7 @@ const DisplaySection = ({ props }) => {
 
   useEffect( () => {
     (async () => {
-      await fetchImages(base, setBase, site);
+      await fetchImages(site, base, setBase);
     })();
   }, []);
 
@@ -76,12 +78,12 @@ const DisplaySection = ({ props }) => {
       <div className='lower-section'>
         <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase }} />
       </div>
-      <ImgModal props={{ setOpen, open }} />
+      {/* <ImgModal props={{ setOpen, open }} /> */}
     </div>
   )
 };
 
-const fetchImages = async (base, setBase, site) => {
+const fetchImages = async (site, base = {}, setBase = () => {}) => {
   const response = await fetch(`https://us-central1-novelty-1281.cloudfunctions.net/check-1/${site}`);
   const myJson = await response.json();
   let imgs = (myJson.files.length >= 0) ? myJson.files : [];
@@ -92,6 +94,13 @@ const fetchImages = async (base, setBase, site) => {
   };
 
   setBase(updateFiles);
+  return updateFiles;
 };
+
+DisplaySection.getInitialProps = async ({ req }) => {
+  const res = await fetchImages('s101');
+  console.log('preeeeee ',res)
+  return { res }
+}
 
 export default DisplaySection;
