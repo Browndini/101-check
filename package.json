@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "puppeteer": "^2.0.0",
+    "@material-ui/core": "^4.7.2",
+    "@zeit/next-css": "^1.0.1",
+    "isomorphic-unfetch": "^3.0.0",
+    "next": "^9.1.6",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-images": "^1.0.0",
@@ -12,8 +15,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "dev": "next",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy-img-get": "cd getImg && gcloud functions deploy check-1",
+    "deploy-img-create": "cd create && gcloud functions deploy create-101-imgs"
   },
   "eslintConfig": {
     "extends": "react-app"

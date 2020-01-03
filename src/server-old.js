@@ -1,13 +1,20 @@
+const locationID = 'kb-img',
+  projectId = 'novelty-1281',
+  keyFilename = './config.json';
+
 const express = require("express");
 const fs = require("fs");
+const imagemin = require('imagemin');
+const imageminPngquant = require('imagemin-pngquant');
+const imageminPngcrush = require('imagemin-pngcrush');
+
 const cors = require('cors');
 const app = express();
 const puppeteer = require('puppeteer');
 const { Storage } = require('@google-cloud/storage');
-const storage = new Storage({
-  projectId: 'novelty-1281',
-  keyFilename: "./config.json"
-});
+const storage = new Storage({ projectId, keyFilename });
+const bucket = storage.bucket(locationID);
+const getPublicUrl = (src) => ({ src });
 
 let experiences = {
   desktop: {
@@ -61,10 +68,24 @@ let siteTests = {
     newnext2: 'https://www.tiebreaker.com/nba-celebrity-fans/2?utm_content=newnext&utm_source=talas&cool'
   },
   f101: {
-    newnext: 'https://www.finance101.com/meal-kit/?utm_content=newnext&utm_source=talas&cool',
-    newnext2: 'https://www.finance101.com/meal-kit/2?utm_content=newnext&utm_source=talas&cool'
+    newnext: 'https://www.finance101.com/retire-abroad-cheap/?utm_content=newnext&utm_source=talas&cool',
+    newnext2: 'https://www.finance101.com/retire-abroad-cheap/2?utm_content=newnext&utm_source=talas&cool'
   }
 };
+
+// TODO: convert to use this data structure
+let sample = {
+  f101: {
+    url: 'https://www.finance101.com/',
+    contentTypes: ['newnext', 'feed'],
+    sourceTypes: ['talas', 'ouins', 'faok'],
+    other: ['cool=1'],
+    pagination: [
+      { newnext: ['1', '2'] },
+    ],
+  }
+};
+
 const sites = Object.keys(siteTests);
 
 app.set("port", process.env.PORT || 3001);
@@ -75,42 +96,40 @@ if (process.env.NODE_ENV !== "production") {
 
 app.get("/create/img/:item", async (req, res) => {
   let found = sites.find(site => site === req.params.item.toLowerCase()) || 's101';
-  await sss(found);
+
+  await siteCheck(found);
   res.json({done: true});
 })
 
 app.get("/img/:item", async (req, res) => {
-  let found = sites.find(site => site === req.params.item.toLowerCase());
+  let site = sites.find(site => site === req.params.item.toLowerCase());
   let prefix = req.params.item.toLowerCase();
-  let [files] = await storage.bucket('kb-img').getFiles({prefix});
-  let items = files.map(s => ({ src: s.metadata.mediaLink }));
+  let [items] = await bucket.getFiles({prefix});
+  let files = items.map(s => getPublicUrl(s.metadata.mediaLink)) || [];
 
-  res.json({
-    files: items || [],
-    site: req.params.item.toLowerCase()
-  });
+  res.json({ files, site });
 });
-
 
 app.listen(app.get("port"), () => {
   console.log(`Find the server at: http://localhost:${app.get("port")}/`); // eslint-disable-line no-console
 });
 
-async function sss(site) {
-  // for (var site in siteTests) {
-    for (var layout in siteTests[site]) {
-      let layoutUrl = siteTests[site][layout];
+async function siteCheck(site) {
+  for (var layout in siteTests[site]) {
+    let layoutUrl = siteTests[site][layout];
 
-      for (var device in experiences) {
-        for (var size in experiences[device]) {
-          let fileName = `../public/img/${site}/${layout}-${device}-${size}.png`;
-          const iPhone = puppeteer.devices['iPhone 6'];
-          const browser = await puppeteer.launch();
-          const context = await browser.createIncognitoBrowserContext();
-          const page = await context.newPage();
-          console.log(`creating image: ${fileName}`);
-
-          if(device === 'mobile') {
+    for (var device in experiences) {
+      for (var size in experiences[device]) {
+        const imgName = `${layout}-${device}-${size}.png`;
+        const filePath = `../public/img/${site}`;
+        const fileName = `${filePath}/${imgName}`;
+        const iPhone = puppeteer.devices['iPhone 6'];
+        const browser = await puppeteer.launch();
+        const context = await browser.createIncognitoBrowserContext();
+        const page = await context.newPage();
+        // console.log(`creating image: ${fileName}`);
+        try {
+          if (device === 'mobile') {
             await page.emulate(iPhone);
             await page.goto(layoutUrl);
             await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
@@ -128,12 +147,40 @@ async function sss(site) {
               await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 2000 });
             }
           }
-
-          await page.waitFor(3000);
-          await page.screenshot({path: fileName, fullPage: true});
-          await browser.close();
+        } catch(e) {
+          console.log('>>>>>> failed to wait for ads after 2 sec <<<<<<');
         }
+
+        await page.waitFor(3000);
+        await page.screenshot({path: fileName, fullPage: true});
+
+
+        imagemin([fileName], {
+          destination: filePath,
+          plugins: [
+            imageminPngquant({
+              quality: [0.6, 0.8]
+            })
+          ]
+        })
+        .finally(() => {
+          sendImage({fileName, site, imgName});
+        })
+
+        await browser.close();
       }
-    // }
+    }
   }
+}
+
+function sendImage({fileName, site, imgName}) {
+  const file = bucket.file(`${site}/${imgName}`);
+  fs.createReadStream(fileName)
+  .pipe(file.createWriteStream())
+  .on('error', function(err) {
+    console.log('woooo error....');
+  })
+  .on('finish', function() {
+    console.log('uploaded image: ',fileName);
+  });
 }

@@ -1,0 +1,278 @@
+body {
+  background: #6d7b8b;
+  overflow: hidden;
+  margin:0px;
+}
+
+.home-container { 
+  display: flex;
+  flex-grow: 1;
+  width: 100vw;
+  height: 100vh;
+}
+.home-tabs { 
+  border-right: solid black 1px;
+  background: #94A89A;
+}
+
+.lower-section {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  margin: 10px 25px;
+}
+
+.button {
+  background: #94a89a;
+  padding: 3px 20px 4px;
+  font-size: .9em;
+  letter-spacing: .09em;
+  transition: .4s;
+}
+
+.button:hover {
+  background: #abc1b2;
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.33);
+  cursor: pointer;
+  transition: .4s;
+}
+
+.c {
+  position: relative;
+  color:rebeccapurple;
+  animation: wave .7s ease-in-out infinite;
+}
+
+.c-1 { animation-delay: 0ms }
+.c-2 { animation-delay: 200ms }
+.c-3 { animation-delay: 440ms }
+
+@keyframes wave {
+  50% {
+    color: rgba(255, 255, 255, .8);
+    top: -3px;
+  }
+  0% , 100% {
+    color: rgb(47, 47, 47);
+    top: 0px;
+  }
+}
+
+.unfocus {
+  display: flex;
+  height: 95vh;
+  width: 80vw;
+}
+
+.unfocus:focus{
+  outline: none;
+}
+
+.modalImage {
+  object-fit: contain;
+  width: 100%;
+}
+
+
+/* changes to material UI - START */
+.MuiTypography-root {
+  width: calc(100% - 160px);
+  overflow: scroll;
+}
+
+.MuiTabs-indicator {
+  width: 4px!important;
+  background-color: #F7DD72!important;
+}
+
+.MuiPaper-root {
+  width: 300px;
+  margin: 0 20px 30px;
+}
+
+@media only screen and (max-width: 600px) {
+  .MuiTypography-root {
+    width: calc(100% - 72px);
+  }
+} 
+/* changes to material UI - END */
+
+/* display images page - START */
+.containImg {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+.imgItems {
+  width: 150px;
+  height: 150px;
+  background-size: cover;
+  margin: 10px 10px;
+}
+/* display images page - END */
+
+
+
+
+
+
+
+
+.navigation {
+  height: 70px;
+  background: #262626;
+}
+
+.brand {
+  position: absolute;
+  padding-left: 20px;
+  float: left;
+  line-height: 70px;
+  text-transform: uppercase;
+  font-size: 1.4em;
+}
+.brand a,
+.brand a:visited {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.nav-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+nav {
+  float: right;
+}
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav ul li {
+  float: left;
+  position: relative;
+}
+nav ul li a,
+nav ul li a:visited {
+  display: block;
+  padding: 0 20px;
+  line-height: 70px;
+  background: #262626;
+  color: #ffffff;
+  text-decoration: none;
+}
+nav ul li a:hover,
+nav ul li a:visited:hover {
+  background: #2581DC;
+  color: #ffffff;
+}
+nav ul li a:not(:only-child):after,
+nav ul li a:visited:not(:only-child):after {
+  padding-left: 4px;
+  content: ' ▾';
+}
+nav ul li ul li {
+  min-width: 190px;
+}
+nav ul li ul li a {
+  padding: 15px;
+  line-height: 20px;
+}
+
+.nav-dropdown {
+  position: absolute;
+  display: none;
+  z-index: 1;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile navigation */
+.nav-mobile {
+  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #262626;
+  height: 70px;
+  width: 70px;
+}
+
+@media only screen and (max-width: 798px) {
+  .nav-mobile {
+    display: block;
+  }
+
+  nav {
+    width: 100%;
+    padding: 70px 0 15px;
+  }
+  nav ul {
+    display: none;
+  }
+  nav ul li {
+    float: none;
+  }
+  nav ul li a {
+    padding: 15px;
+    line-height: 20px;
+  }
+  nav ul li ul li a {
+    padding-left: 30px;
+  }
+
+  .nav-dropdown {
+    position: static;
+  }
+}
+@media screen and (min-width: 799px) {
+  .nav-list {
+    display: block !important;
+  }
+}
+#nav-toggle {
+  position: absolute;
+  left: 18px;
+  top: 22px;
+  cursor: pointer;
+  padding: 10px 35px 16px 0px;
+}
+#nav-toggle span,
+#nav-toggle span:before,
+#nav-toggle span:after {
+  cursor: pointer;
+  border-radius: 1px;
+  height: 5px;
+  width: 35px;
+  background: #ffffff;
+  position: absolute;
+  display: block;
+  content: '';
+  transition: all 300ms ease-in-out;
+}
+#nav-toggle span:before {
+  top: -10px;
+}
+#nav-toggle span:after {
+  bottom: -10px;
+}
+#nav-toggle.active span {
+  background-color: transparent;
+}
+#nav-toggle.active span:before, #nav-toggle.active span:after {
+  top: 0;
+}
+#nav-toggle.active span:before {
+  transform: rotate(45deg);
+}
+#nav-toggle.active span:after {
+  transform: rotate(-45deg);
+}
+
+article {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px;
+}

@@ -1,96 +1,80 @@
-import React from 'react';
-import ImgModal from './components/ImgModal';
-import DisplayImages from './components/DisplayImages';
-import GenButton from './components/GenButton';
-import './App.css';
-import './imgs.css';
+import React, { useState } from 'react';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import Box from '@material-ui/core/Box';
+
+import DisplaySection from './components/DisplaySection';
+import './Home.css';
+
+const base = {
+  imgs: [],
+  generating: '',
+  doneGenerating: false,
+};
 const siteFiles = {
-  's101': { imgs:[] },
-  'f101': { imgs:[] },
-  'l101': { imgs:[] },
-  'h101': { imgs:[] },
-  'tb':   { imgs:[] },
-  'de':   { imgs:[] },
-  'ip':   { imgs:[] },
-  'p101': { imgs:[] },
-  'v101': { imgs:[] },
-  'a101': { imgs:[] },
+  s101: base,
+  f101: base,
+  l101: base,
+  h101: base,
+  tb:   base,
+  de:   base,
+  ip:   base,
+  a101: base,
+  p101: base,
+  v101: base,
+};
+const styles = {
+  container: { "display": "flex", "flexGrow": "1", "width": "100vw", "height": "100vh" },
+  tabs: { "borderRight": "solid black 1px" , "background": "#94A89A"}
 };
 const sites = Object.keys(siteFiles);
 
-// TODO: display all images
-// TODO: generate seperate site images
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      modalIsOpen: '',
-      selectedIndex: 0,
-      siteFiles,
-      site: '',  
-      generating: '',
-      doneGenerating: false,
-    };
-    sites.forEach(s => {
-      this.fetchImages(s);
-    })
-  }
-
-  toggleModal = (selectedIndex, site) => {
-    this.setState(state => ({ modalIsOpen: site, selectedIndex }));
-  }
-
-  fetchImages = async (site = 's101') => {
-    const response = await fetch(`http://localhost:3001/img/${site}`);
-    const myJson = await response.json();
-    let imgs = (myJson.files.length >= 0) ? myJson.files : [];
-
-    this.setState(state => ({
-      siteFiles: {
-        ...state.siteFiles,
-        [site]: {
-          imgs
-        }
-      }
-    }));
-  }
-
-  generateImages = async (site) => {
-    this.setState(state => ({ generating: site }));
-    const response = await fetch(`http://localhost:3001/create/img/${site}`);
-    const myJson = await response.json();
-    if(!myJson.done) return true;
-    await this.fetchImages(site);
-    this.setState(state => ({ generating: 'done', doneGenerating: site }));
-    setTimeout(() => {
-      this.setState(state => ({ generating: '', doneGenerating: false }));
-    }, 2000);
-  }
+const Home = () => {
+  const [ value, setValue ] = useState(0);
   
+  console.log('called render,,...');
+  
+  return (
+    <div style={styles.container}>
+      <Tabs
+        orientation="vertical"
+        variant="scrollable"
+        value={value}
+        onChange={(event, newValue) => {setValue(newValue)}}
+        aria-label="Vertical tabs example"
+        style={styles.tabs}
+      >
+        {sites.map((site, index) => <Tab key={site} label={`${site}`} id={`vertical-tab-${index}`} />)}
+      </Tabs>
 
-  render() {
-    const { modalIsOpen, selectedIndex, siteFiles, generating, doneGenerating } = this.state;
-    let toggleModal = this.toggleModal;
-    let generateImages = this.generateImages;
-
-    return (
-      <div className="App App-header">
-        {sites.map(site => {
-          let files = siteFiles[site].imgs;
-          return (
-            <div className='section' key={site}>
-              <h3>{site}</h3>
-              <DisplayImages props={{files, site, toggleModal}} />
-              <div className='lower-section'>
-                <GenButton props={{ generating, site, doneGenerating, generateImages }} />
-              </div>
-              <ImgModal props={{ selectedIndex, modalIsOpen, toggleModal, files, site }} />
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
+      {sites.map((site, index) => {
+        return (
+          <TabPanel key={site} value={value} index={index}>
+            <DisplaySection key={site} props={{site}} />
+          </TabPanel>
+        );
+        
+      })}
+    </div>
+  );
 }
 
-export default App;
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`vertical-tabpanel-${index}`}
+      aria-labelledby={`vertical-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </Typography>
+  );
+}
+
+export default Home;
