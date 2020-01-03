@@ -2,8 +2,8 @@ import React,  { useState, useEffect } from 'react';
 import fetch from 'isomorphic-unfetch';
 import DisplayImages from './DisplayImages';
 import GenButton from './GenButton';
-
-// import ImgModal from './ImgModal';
+import Router from 'next/router';
+import ImgModal from './ImgModal';
 
   const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase) => {
     setGenerating(site);
@@ -36,40 +36,29 @@ import GenButton from './GenButton';
       })
       console.log('wo yeah ',final);
 
-    await fetchImages(base, setBase, site);
-    setDoneGenerating(site);
-    setGenerating('done');
-    // this.setState(state => ({ generating: 'done', doneGenerating: site }));
-    setTimeout(() => {
-      setDoneGenerating(false);
-      setGenerating('');
-      // this.setState(state => ({ generating: '', doneGenerating: false }));
-    }, 2000);
+      setDoneGenerating(site);
+      setGenerating('done');
+
+      setTimeout(() => {
+        setDoneGenerating(false);
+        setGenerating('');
+        Router.push(`/check/${site}`);
+      }, 2000);
   
   }
 
 
 const DisplaySection = ({ props }) => {
-  const { site } = props;
+  const { site, imgs } = props;
   const [ generating, setGenerating ] = useState('');
   const [ doneGenerating, setDoneGenerating ] = useState(false);
   const [ value, setValue ] = useState(0);
   const [ open, setOpen ] = useState(false);
   const [ base, setBase ] = useState({
-    imgs: [],
+    imgs,
     generating: '',
     doneGenerating: false,
   });
-
-  // if (base.imgs.length <= 0) {
-  //   fetchImages(base, setBase, site);
-  // }
-
-  useEffect( () => {
-    (async () => {
-      await fetchImages(site, base, setBase);
-    })();
-  }, []);
 
   return (
     <div className='section' key={site}>
@@ -78,29 +67,9 @@ const DisplaySection = ({ props }) => {
       <div className='lower-section'>
         <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase }} />
       </div>
-      {/* <ImgModal props={{ setOpen, open }} /> */}
+      <ImgModal props={{ setOpen, open }} />
     </div>
   )
 };
-
-const fetchImages = async (site, base = {}, setBase = () => {}) => {
-  const response = await fetch(`https://us-central1-novelty-1281.cloudfunctions.net/check-1/${site}`);
-  const myJson = await response.json();
-  let imgs = (myJson.files.length >= 0) ? myJson.files : [];
-
-  let updateFiles = {
-    ...base,
-    imgs
-  };
-
-  setBase(updateFiles);
-  return updateFiles;
-};
-
-DisplaySection.getInitialProps = async ({ req }) => {
-  const res = await fetchImages('s101');
-  console.log('preeeeee ',res)
-  return { res }
-}
 
 export default DisplaySection;
