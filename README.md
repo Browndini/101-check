@@ -12,11 +12,15 @@ https://cloud.google.com/nodejs/getting-started/using-cloud-storage
 
 ## server
 
-`cd server `
+`cd api/create `
+
 `npm i`
+
 `node index.js`
 
 ## react
-`cd ..`
+`cd ../..`
+
 `npm i`
-`npm start`
+
+`npm run dev`
