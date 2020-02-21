@@ -1,6 +1,6 @@
 
 ## google storage setup
-add your google "service account key" `/server/config.json`
+add your google "service account key" `/api/create/config.json`
 
 If you don't have one yet go here 
 https://console.cloud.google.com/apis/credentials/serviceaccountkey?_ga=2.82621008.-795332206.1573494098
