@@ -5,6 +5,8 @@ import GenButton from './GenButton';
 import Router from 'next/router';
 import ImgModal from './ImgModal';
 
+// temporary disabled cloud functions because they take to long
+// for cloud functions
   const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase) => {
     setGenerating(site);
     // this.setState(state => ({ generating: site }));
@@ -13,9 +15,11 @@ import ImgModal from './ImgModal';
       ['newnext', 'newnext2'].forEach(layout => {
         ['mobile', 'desktop'].forEach(device => {
           if ( size === 'small' && device === 'mobile') {
-            ss.push(fetch(`https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs/${site}/${device}/iphone/${layout}`))
+            ss.push(fetch(`http://localhost:8080/${site}/${device}/iphone/${layout}`))
+            // ss.push(fetch(`https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs/${site}/${device}/iphone/${layout}`))
           } else if (device !== 'mobile') {
-            ss.push(fetch(`https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs/${site}/${device}/${size}/${layout}`));
+            ss.push(fetch(`http://localhost:8080/${site}/${device}/${size}/${layout}`));
+            // ss.push(fetch(`https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs/${site}/${device}/${size}/${layout}`));
           }
         });
       });

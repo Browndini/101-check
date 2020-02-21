@@ -26,6 +26,8 @@ const express = require('express');
 const app = express();
 const port = 8080;
 
+process.setMaxListeners(Infinity); 
+
 app.get('/:site/:device/:size/:layout', async (req, res) => {
   
   const data = req.params;
@@ -63,23 +65,54 @@ async function siteCheck({site, device, size, layout}) {
     } else {
       await page.setViewport(experiences[device][size]);
       await page.goto(layoutUrl);
-      await page.waitFor(1000);
+      await page.waitFor(10000);
 
       switch(size) {
         case 'large':
-          await page.waitFor(() => !!document.querySelector('#rect-top-right-1 > div'), { timeout: 1000 });
-          await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 1000 });
+          await page.waitFor(() => !!document.querySelector('#rect-top-right-1 > div'), { timeout: 8000 });
+          await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 8000 });
         case 'small':
         case 'medium':
         default:
           if (layout === 'newnext2') {
-            await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 1000 });
+            await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 8000 });
           } else {
-            await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 1000 });
+            await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 8000 });
           }
           break;
       }
     }
+
+    // show boxes where ads were rendered
+    // problem: doesn't show the squares as transparent but they should be
+    // await page.waitFor(() => {
+    //   [...document.querySelectorAll('[data-google-query-id]')].forEach((s) => {
+    //     if (s.id === 'pos1x1-head-1') return;
+    //     if (s.id === 'pos1x1-foot-1') return;
+    //     console.log('da id', s.id);
+    //     let p = document.createElement("div");
+    //     s.style.cssText = 'position: relative;';
+    //     p.style.cssText = `
+    //       font-size: 12px;
+    //       position: absolute;
+    //       top: 0px;
+    //       left: 0px;
+    //       width: 100%;
+    //       height: 100%;
+    //       overflow-wrap: break-word;
+    //       padding: 10px;
+    //       color: red;
+
+    //       display: flex;
+    //       align-items: center;
+    //       word-break: break-all;
+    //     `;
+        
+    //     p.append(s.firstElementChild.id);
+    //     s.appendChild(p);
+    //   })
+    //   return;
+    // }, { timeout: 5000 })
 
     const file = bucket.file(`${site}/${imgName}`);
     const image = await page.screenshot({ fullPage: true });
