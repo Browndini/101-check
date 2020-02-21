@@ -24,3 +24,7 @@ https://cloud.google.com/nodejs/getting-started/using-cloud-storage
 `npm i`
 
 `npm run dev`
+
+your code will be running here.
+
+http://localhost:3000/check/de
