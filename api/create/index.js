@@ -9,7 +9,10 @@
 
 // gcloud app deploy --version 20191218t155353 --no-promote app.yaml
 
-const locationID = 'kb-img';
+import { config } from '../../config';
+import { helloWorld } from '../getImg';
+
+const locationID = config.bucket;
 const projectId = 'novelty-1281';
 const keyFilename = './config.json'
 const { experiences, siteTests } = require('./img-config');
@@ -26,13 +29,17 @@ const express = require('express');
 const app = express();
 const port = 8080;
 
-process.setMaxListeners(Infinity); 
+process.setMaxListeners(Infinity);
+
+let browser;
 
 app.get('/:site/:device/:size/:layout', async (req, res) => {
-  
+
+  if (!browser) {
+    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
+  }
   const data = req.params;
   const created = await siteCheck(data);
-  // const created = {cool:'yup'};
 
   res.type('application/json');
   res.set('Access-Control-Allow-Origin', "*");
@@ -41,30 +48,44 @@ app.get('/:site/:device/:size/:layout', async (req, res) => {
   } else {
     res.json({data, ...created});
   }
-})
+});
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.get('/check-1/:site', helloWorld);
 
+app.listen(port, () => console.log(`Looki server listening on port ${port}!`))
 
-async function siteCheck({site, device, size, layout}) {
+async function siteCheck({ site, device, size, layout }) {
   const layoutUrl = siteTests[site][layout];
   const imgName = `${layout}-${device}-${size}.png`;
 
-  
   try {
     const iPhone = puppeteer.devices['iPhone 6'];
-    const browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
+    console.log({ layoutUrl });
+
+
 
     if (device === 'mobile') {
       await page.emulate(iPhone);
       await page.goto(layoutUrl);
       await page.waitFor(1000);
+
+      await page.evaluate(() => {
+        window.deApp.disableIas();
+        window.document.location.reload();
+      });
+
       await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
     } else {
       await page.setViewport(experiences[device][size]);
       await page.goto(layoutUrl);
+
+      await page.evaluate(() => {
+        window.deApp.disableIas();
+        window.document.location.reload();
+      });
+
       await page.waitFor(10000);
 
       switch(size) {
@@ -83,14 +104,15 @@ async function siteCheck({site, device, size, layout}) {
       }
     }
 
+
     // show boxes where ads were rendered
     // problem: doesn't show the squares as transparent but they should be
-    // await page.waitFor(() => {
+    // await page.evaluate(() => {
     //   [...document.querySelectorAll('[data-google-query-id]')].forEach((s) => {
     //     if (s.id === 'pos1x1-head-1') return;
     //     if (s.id === 'pos1x1-foot-1') return;
     //     console.log('da id', s.id);
-    //     let p = document.createElement("div");
+    //     let p = document.createElement('div');
     //     s.style.cssText = 'position: relative;';
     //     p.style.cssText = `
     //       font-size: 12px;
@@ -101,21 +123,28 @@ async function siteCheck({site, device, size, layout}) {
     //       height: 100%;
     //       overflow-wrap: break-word;
     //       padding: 10px;
-    //       color: red;
-
+    //       background: rgba(20,20,255,.1);
     //       display: flex;
     //       align-items: center;
     //       word-break: break-all;
     //     `;
-        
+    //
     //     p.append(s.firstElementChild.id);
     //     s.appendChild(p);
     //   })
     //   return;
-    // }, { timeout: 5000 })
+    // });
 
     const file = bucket.file(`${site}/${imgName}`);
-    const image = await page.screenshot({ fullPage: true });
+    const image = await page.screenshot({
+      fullPage: true,
+      // clip: {
+      //   x: 0,
+      //   y: 0,
+      //   width: experiences[device][size].width,
+      //   height: experiences[device][size].height
+      // }
+    });
     const imageCompressed = await imagemin.buffer(image, {
       plugins: [
         imageminPngquant({
@@ -123,11 +152,12 @@ async function siteCheck({site, device, size, layout}) {
         })
       ]
     });
-  
-  
+
     await file.save(imageCompressed);
-    await browser.close();
-    
+    await page.goto('about:blank');
+    await page.close();
+    await context.close();
+
     return { created: `${site}/${imgName}`, done: true };
   } catch(error) {
     return { error, done: false };
