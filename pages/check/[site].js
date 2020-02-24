@@ -11,18 +11,12 @@ const base = {
   generating: '',
   doneGenerating: false,
 };
-const siteFiles = {
-  s101: base,
-  f101: base,
-  l101: base,
-  h101: base,
-  tb:   base,
-  de:   base,
-  ip:   base,
-  a101: base,
-  p101: base,
-  v101: base,
-};
+
+const siteFiles = {};
+
+Object.keys(config.siteTests).forEach((exp) => {
+  siteFiles[exp] = base;
+});
 
 const sites = Object.keys(siteFiles);
 

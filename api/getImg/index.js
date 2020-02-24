@@ -1,10 +1,3 @@
-// to test locally
-// for help https://cloud.google.com/functions/docs/functions-framework
-// make sure you have a google config file
-// add -> const keyFilename = '../config.json'
-// change to -> const storage = new Storage({ projectId, keyFilename });
-// finally run -> `npm start`
-
 import { config } from '../../config';
 
 const keyFilename = '../create/config.json';

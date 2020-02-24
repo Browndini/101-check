@@ -11,6 +11,7 @@
 
 import { config } from '../../config';
 import { helloWorld } from '../getImg';
+import * as uuidv4 from 'uuidv4';
 
 const locationID = config.bucket;
 const projectId = 'novelty-1281';
@@ -28,6 +29,12 @@ const bucket = storage.bucket(locationID);
 const express = require('express');
 const app = express();
 const port = 8080;
+
+
+const jumble = (str) => {
+    const smaller = str.split('').filter((j, i) => i % 3 === 0);
+    return smaller.map((v, i) => i % 2 ? v.toLowerCase() : v.toUpperCase()).join('');
+};
 
 process.setMaxListeners(Infinity);
 
@@ -55,7 +62,10 @@ app.get('/check-1/:site', helloWorld);
 app.listen(port, () => console.log(`Looki server listening on port ${port}!`))
 
 async function siteCheck({ site, device, size, layout }) {
-  const layoutUrl = siteTests[site][layout];
+
+  const bust = jumble(require('uuid').v4().replace(/-/g, ''));
+  const layoutUrl = `${siteTests[site][layout]}&bust=${bust}`;
+
   const imgName = `${layout}-${device}-${size}.png`;
 
   try {
@@ -63,8 +73,6 @@ async function siteCheck({ site, device, size, layout }) {
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
     console.log({ layoutUrl });
-
-
 
     if (device === 'mobile') {
       await page.emulate(iPhone);
@@ -76,7 +84,7 @@ async function siteCheck({ site, device, size, layout }) {
         window.document.location.reload();
       });
 
-      await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
+      // await page.waitFor(() => !!document.querySelector('#rect-mid-1 > div'));
     } else {
       await page.setViewport(experiences[device][size]);
       await page.goto(layoutUrl);
@@ -86,23 +94,26 @@ async function siteCheck({ site, device, size, layout }) {
         window.document.location.reload();
       });
 
-      await page.waitFor(10000);
+      // await page.waitFor(5000);
 
-      switch(size) {
-        case 'large':
-          await page.waitFor(() => !!document.querySelector('#rect-top-right-1 > div'), { timeout: 8000 });
-          await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 8000 });
-        case 'small':
-        case 'medium':
-        default:
-          if (layout === 'newnext2') {
-            await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 8000 });
-          } else {
-            await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 8000 });
-          }
-          break;
-      }
+      // switch(size) {
+      //   case 'large':
+      //     await page.waitFor(() => !!document.querySelector('#rect-top-right-1 > div'), { timeout: 8000 });
+      //     await page.waitFor(() => !!document.querySelector('#halfpage-mid-right-1 > div'), { timeout: 8000 });
+      //   case 'small':
+      //   case 'medium':
+      //   default:
+      //     if (layout === 'newnext2') {
+      //       await page.waitFor(() => !!document.querySelector('#leader-top-center-1 > div'), { timeout: 8000 });
+      //     } else {
+      //       await page.waitFor(() => !!document.querySelector('#leader-bot-center-1 > div'), { timeout: 8000 });
+      //     }
+      //     break;
+      // }
     }
+
+    await page.waitFor(5000);
+
 
 
     // show boxes where ads were rendered
@@ -158,7 +169,9 @@ async function siteCheck({ site, device, size, layout }) {
     await page.close();
     await context.close();
 
-    return { created: `${site}/${imgName}`, done: true };
+    const status = { created: `${site}/${imgName}`, done: true };
+    console.log('%o', status);
+    return status;
   } catch(error) {
     return { error, done: false };
   }

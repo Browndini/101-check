@@ -1,3 +1,5 @@
+import { experiences, siteTests } from './api/create/img-config';
+
 const environment = process.env.ENVIRONMENT || 'development';
 
 export const env = {
@@ -10,9 +12,9 @@ export const env = {
     bucket: 'kb-img',
     'generateImages': 'https://us-central1-novelty-1281.cloudfunctions.net/create-101-imgs',
     'fetchImages': 'https://us-central1-novelty-1281.cloudfunctions.net/',
-  }
+  },
 };
 
 export const configGetter = () => env[environment];
 
-export const config = configGetter();
+export const config = { ...configGetter(), experiences, siteTests };

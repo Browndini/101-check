@@ -25,11 +25,23 @@ exports.siteTests = {
     newnext: 'https://www.science101.com/30-most-dangerous-tourist-beaches-world/?utm_content=newnext&utm_source=talas&cool',
     newnext2: 'https://www.science101.com/30-most-dangerous-tourist-beaches-world/2?utm_content=newnext&utm_source=talas&cool'
   },
-  h101: {
+  'hh:prod': {
     newnext: 'https://www.history101.com/gilligans-island-a-fateful-trip-behind-the-scenes/?utm_source=talas&utm_campaign=Co_TS_H101_US_D_Gilligans_v3_1102&utm_content=newnext',
     newnext2: 'https://www.history101.com/gilligans-island-a-fateful-trip-behind-the-scenes/2?utm_source=talas&utm_campaign=Co_TS_H101_US_D_Gilligans_v3_1102&utm_content=newnext',
     newnext3: 'https://www.history101.com/gilligans-island-a-fateful-trip-behind-the-scenes/?utm_content=newnext&utm_source=ouins&cool',
     newnext4: 'https://www.history101.com/gilligans-island-a-fateful-trip-behind-the-scenes/2?utm_content=newnext&utm_source=ouins&cool'
+  },
+  'hh:104.198.176.16': {
+    newnext: 'http://104.198.176.16/gilligans-island-a-fateful-trip-behind-the-scenes/?utm_source=talas&utm_campaign=Co_TS_H101_US_D_Gilligans_v3_1102&utm_content=newnext',
+    newnext2: 'http://104.198.176.16/gilligans-island-a-fateful-trip-behind-the-scenes/2?utm_source=talas&utm_campaign=Co_TS_H101_US_D_Gilligans_v3_1102&utm_content=newnext',
+    newnext3: 'http://104.198.176.16/gilligans-island-a-fateful-trip-behind-the-scenes/?utm_content=newnext&utm_source=ouins&cool',
+    newnext4: 'http://104.198.176.16/gilligans-island-a-fateful-trip-behind-the-scenes/2?utm_content=newnext&utm_source=ouins&cool'
+  },
+  'hhhistory101': {
+    newnext: 'https://hhhistory101.global.ssl.fastly.net/gilligans-island-a-fateful-trip-behind-the-scenes/?utm_source=talas&utm_campaign=Co_TS_H101_US_D_Gilligans_v3_1102&utm_content=newnext',
+    newnext2: 'https://hhhistory101.global.ssl.fastly.net/gilligans-island-a-fateful-trip-behind-the-scenes/2?utm_source=talas&utm_campaign=Co_TS_H101_US_D_Gilligans_v3_1102&utm_content=newnext',
+    newnext3: 'https://hhhistory101.global.ssl.fastly.net/gilligans-island-a-fateful-trip-behind-the-scenes/?utm_content=newnext&utm_source=ouins&cool',
+    newnext4: 'https://hhhistory101.global.ssl.fastly.net/gilligans-island-a-fateful-trip-behind-the-scenes/2?utm_content=newnext&utm_source=ouins&cool'
   },
   a101: {
     newnext: 'https://www.autos101.com/uncategorized/celebrity-expensive-cars/?utm_content=newnext&utm_source=talas&cool',
