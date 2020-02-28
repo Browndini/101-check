@@ -21,6 +21,17 @@ exports.experiences = {
   }
 };
 exports.siteTests = {
+  'tb-og': {
+    newnext: 'https://www.tiebreaker.com/gym-photos-funny-fails?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext2: 'https://www.tiebreaker.com/largest-athletes?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext3: 'https://www.tiebreaker.com/largest-athletes?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext4: 'https://www.tiebreaker.com/marriage-proposal-fails-thatll-make-you-cringe?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext5: 'https://www.tiebreaker.com/gym-photos-funny-fails/2?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext6: 'https://www.tiebreaker.com/largest-athletes/2?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext7: 'https://www.tiebreaker.com/largest-athletes/2?utm_source=ouins&utm_medium=dummy&utm_content=newnext',
+    newnext8: 'https://www.tiebreaker.com/marriage-proposal-fails-thatll-make-you-cringe/2?utm_source=ouins&utm_medium=dummy&utm_content=newnext'
+
+  },
   s101: {
     newnext: 'https://www.science101.com/30-most-dangerous-tourist-beaches-world/?utm_content=newnext&utm_source=talas&cool',
     newnext2: 'https://www.science101.com/30-most-dangerous-tourist-beaches-world/2?utm_content=newnext&utm_source=talas&cool'

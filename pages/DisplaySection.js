@@ -7,20 +7,22 @@ import ImgModal from './ImgModal';
 
 import { config } from '../config';
 
+const { siteTests } = require('../api/create/img-config');
+
 // temporary disabled cloud functions because they take to long
 // for cloud functions
-  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase) => {
-    console.log({ generateImages })
+  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase, dev) => {
+    const siteKeys = Object.keys(siteTests[site]);
     setGenerating(site);
     // this.setState(state => ({ generating: site }));
     let ss = [];
     ['large', 'small', 'medium'].forEach(size => {
-      ['newnext', 'newnext2'].forEach(layout => {
+      [siteKeys[0]].forEach(layout => {
         ['mobile', 'desktop'].forEach(device => {
           if ( size === 'small' && device === 'mobile') {
-            ss.push(fetch(`${config.generateImages}/${site}/${device}/iphone/${layout}`));
+            ss.push(fetch(`${config.generateImages}/${site}/${device}/iphone/${layout}${dev ? '/dev' : ''}`));
           } else if (device !== 'mobile') {
-            ss.push(fetch(`${config.generateImages}/${site}/${device}/${size}/${layout}`));
+            ss.push(fetch(`${config.generateImages}/${site}/${device}/${size}/${layout}${dev ? '/dev' : ''}`));
           }
         });
       });

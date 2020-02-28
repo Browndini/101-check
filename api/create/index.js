@@ -11,7 +11,7 @@
 
 import { config } from '../../config';
 import { helloWorld } from '../getImg';
-import * as uuidv4 from 'uuidv4';
+import * as uuid from 'uuidv4';
 
 const locationID = config.bucket;
 const projectId = 'novelty-1281';
@@ -30,7 +30,6 @@ const express = require('express');
 const app = express();
 const port = 8080;
 
-
 const jumble = (str) => {
     const smaller = str.split('').filter((j, i) => i % 3 === 0);
     return smaller.map((v, i) => i % 2 ? v.toLowerCase() : v.toUpperCase()).join('');
@@ -40,17 +39,19 @@ process.setMaxListeners(Infinity);
 
 let browser;
 
-app.get('/:site/:device/:size/:layout', async (req, res) => {
+app.get('/:site/:device/:size/:layout/:dev?', async (req, res) => {
 
   if (!browser) {
-    browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
+    browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
   }
   const data = req.params;
+
+  console.log({ data });
   const created = await siteCheck(data);
 
   res.type('application/json');
   res.set('Access-Control-Allow-Origin', "*");
-  if(typeof created === 'object') {
+  if (typeof created === 'object') {
     res.json({data, ...created});
   } else {
     res.json({data, ...created});
@@ -61,12 +62,13 @@ app.get('/check-1/:site', helloWorld);
 
 app.listen(port, () => console.log(`Looki server listening on port ${port}!`))
 
-async function siteCheck({ site, device, size, layout }) {
+async function siteCheck({ site, device, size, layout, dev }) {
 
+  // const bust = jumble(uuid.v4().replace(/-/g, ''));
   const bust = jumble(require('uuid').v4().replace(/-/g, ''));
-  const layoutUrl = `${siteTests[site][layout]}&bust=${bust}`;
+  const layoutUrl = `${siteTests[site][layout]}&bust=${bust}${dev ? '&dev=1': ''}`;
 
-  const imgName = `${layout}-${device}-${size}.png`;
+  const imgName = `${layout}-${device}-${size}${dev ? '-dev': ''}.png`;
 
   try {
     const iPhone = puppeteer.devices['iPhone 6'];
