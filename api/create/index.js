@@ -114,7 +114,7 @@ async function siteCheck({ site, device, size, layout, dev }) {
       // }
     }
 
-    await page.waitFor(5000);
+    await page.waitFor(10000);
 
 
 

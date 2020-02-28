@@ -1,8 +1,15 @@
+.scroller {
+  overflow-y: scroll;
+  height: calc(100vh - 300px);
+  /* display: none; */
+}
+
 .containImg {
   display: flex;
   align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
+  /* overflow-y: scroll; */
 }
 .imgItems {
   width: 150px;

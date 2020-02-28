@@ -17,7 +17,7 @@ const { siteTests } = require('../api/create/img-config');
     // this.setState(state => ({ generating: site }));
     let ss = [];
     ['large', 'small', 'medium'].forEach(size => {
-      [siteKeys[0]].forEach(layout => {
+      siteKeys.forEach(layout => {
         ['mobile', 'desktop'].forEach(device => {
           if ( size === 'small' && device === 'mobile') {
             ss.push(fetch(`${config.generateImages}/${site}/${device}/iphone/${layout}${dev ? '/dev' : ''}`));
@@ -69,10 +69,10 @@ const DisplaySection = ({ props }) => {
   return (
     <div className='section' key={site}>
       <h2>{site}</h2>
-      <DisplayImages props={{files: base.imgs, setOpen}} />
       <div className='lower-section'>
         <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase }} />
       </div>
+      <DisplayImages props={{files: base.imgs, setOpen}} />
       <ImgModal props={{ setOpen, open }} />
     </div>
   )
