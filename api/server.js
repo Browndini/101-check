@@ -1,14 +1,22 @@
 // Transpile all code following this line with babel and use '@babel/preset-env' (aka ES6) preset.
 require("@babel/register")({
-  presets: ["@babel/preset-env"],
-  plugins: [
-      ["@babel/plugin-transform-runtime",
-        {
-          "regenerator": true
-        }
-      ]
+    presets: ["@babel/preset-env"],
+    plugins: [
+        ["@babel/plugin-transform-runtime",
+            {
+                "regenerator": true
+            }
+        ]
     ],
 });
 
-// Import the rest of our application.
-module.exports = require('./')
+import { getImg } from './getImg';
+import  { siteCheck } from './create';
+
+const express = require('express');
+const app = express();
+const port = 8080;
+
+app.get('/check-1/:site', getImg);
+app.get('/:site/:device/:size/:layout/:dev?', siteCheck);
+app.listen(port, () => console.log(`Looki server listening on port ${port}!`));

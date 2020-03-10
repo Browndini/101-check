@@ -30,16 +30,12 @@ const DisplayImages = ({ props: { files, setOpen } }) => {
               <div key={num} className='imgItems' style={{...bgImageStyle}}>
                   <Chip style={{ float:'left' }} label="prod" />
                   {Object.keys(tags).sort().map((t) => <Chip style={{ float:'left' }} label={tags[t]} />)}
-                  <br />
-                  {item.layoutUrl && <a href={item.layoutUrl || "#"}>prod<br /></a>}
                   <img className="img" alt="" src={item.src} onClick={() => setOpen([item])} />< br />
               </div>
               {devResult &&
                 <div key={`d-${num}`} className='imgItems' title={devResult.src} style={{...devStyle}}>
                   <Chip style={{ float:'left' }} label="dev" />
                   {Object.keys(tags).sort().map((t) => <Chip style={{ float:'left' }} label={tags[t]} />)}
-                  <br />
-                  {devResult.layoutUrl && <a href={devResult.layoutUrl || "#"}>dev<br /></a>}
                   <img className="img" alt="" src={devResult.src} onClick={() => setOpen([devResult])} /><br />
               </div>}
               {!devResult && <div className='imgItems' style={{...devStyle}} />}

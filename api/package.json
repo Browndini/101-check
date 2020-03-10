@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "create/index.js",
   "dependencies": {
     "@babel/core": "^7.8.4",
     "@babel/preset-env": "^7.8.4",
@@ -18,11 +18,11 @@
     "uuidv4": "^6.0.2"
   },
   "scripts": {
-    "server": "node index.js",
+    "server": "node create/index.js",
     "client": "node start-client.js",
     "dev": "echo \"This command has been deprecated. Use 'npm start'\" && exit 1",
-    "lint": "eslint .",
-    "start": "node index.js"
+    "lint": "eslint create",
+    "start": "node create/index.js"
   },
   "author": "",
   "license": "ISC",
