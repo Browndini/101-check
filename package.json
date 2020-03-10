@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.9.4",
     "@zeit/next-css": "^1.0.1",
+    "async": "^3.2.0",
     "isomorphic-unfetch": "^3.0.0",
     "next": "^9.1.6",
     "react": "^16.11.0",
@@ -13,6 +14,8 @@
     "react-scripts": "3.2.0"
   },
   "scripts": {
+    "serve": "cd api/; node -r esm server.js",
+    "serve:w": "cd api/; nodemon -r esm server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "dev": "next",
@@ -35,5 +38,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "lerna": "^3.20.2"
   }
 }

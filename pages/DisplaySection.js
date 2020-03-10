@@ -4,6 +4,8 @@ import DisplayImages from './DisplayImages';
 import GenButton from './GenButton';
 import Router from 'next/router';
 import ImgModal from './ImgModal';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import mapLimit from 'async/mapLimit';
 
 import { config } from '../config';
 
@@ -11,49 +13,60 @@ const { siteTests } = require('../api/create/img-config');
 
 // temporary disabled cloud functions because they take to long
 // for cloud functions
-  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase, dev) => {
+  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase, dev, setCompleted) => {
     const siteKeys = Object.keys(siteTests[site]);
     setGenerating(site);
-    // this.setState(state => ({ generating: site }));
     let ss = [];
+    // ['large'].forEach(size => {
+      // [siteKeys[0]].forEach(layout => {
     ['large', 'small', 'medium'].forEach(size => {
       siteKeys.forEach(layout => {
         ['mobile', 'desktop'].forEach(device => {
           if ( size === 'small' && device === 'mobile') {
-            ss.push(fetch(`${config.generateImages}/${site}/${device}/iphone/${layout}${dev ? '/dev' : ''}`));
+            ss.push(`${config.generateImages}/${site}/${device}/iphone/${layout}${dev ? '/dev' : ''}`);
           } else if (device !== 'mobile') {
-            ss.push(fetch(`${config.generateImages}/${site}/${device}/${size}/${layout}${dev ? '/dev' : ''}`));
+            ss.push(`${config.generateImages}/${site}/${device}/${size}/${layout}${dev ? '/dev' : ''}`);
           }
         });
       });
     });
 
-    console.log({ ss });
+    setCompleted(1);
 
     let final = false;
-    await Promise.all(ss)
-      .then(responses => Promise.all(responses.map(r => r.json())))
-      .then(data => {
-        let m = data.findIndex(s => s.done === false);
-        if(m >= 0) {
-          final = data[m];
-        }
-      }).catch(e => {
-        console.log('woooo',e);
-      })
-      console.log('wo yeah ',final);
+    const results = [];
+    let done = 0;
+    mapLimit(ss, 4, async (item) => {
+      const res = await fetch(item);
+      done++;
+      console.log('fetching ...', item, (done / ss.length) * 100);
+      setCompleted((done / ss.length) * 100);
+      results.push(res);
+    }, (err, res) => {
+      Promise.all(results)
+        .then(responses => {
+          return Promise.all(responses.map(r => r.json()));
+        })
+        .then(data => {
+          let m = data.findIndex(s => s.done === false);
+          if (m >= 0) {
+            final = data[m];
+          }
+        }).catch(e => {
+          console.error('woooo',e);
+        });
 
-      setDoneGenerating(site);
-      setGenerating('done');
+        setDoneGenerating(site);
+        setGenerating('done');
 
-      setTimeout(() => {
-        setDoneGenerating(false);
-        setGenerating('');
-        Router.push(`/check/${site}`);
-      }, 2000);
-
+        setTimeout(() => {
+          setDoneGenerating(false);
+          setGenerating('');
+          setCompleted(0);
+          Router.push(`/check/${site}`);
+        }, 2000);
+    });
   }
-
 
 const DisplaySection = ({ props }) => {
   const { site, imgs } = props;
@@ -65,14 +78,16 @@ const DisplaySection = ({ props }) => {
     generating: '',
     doneGenerating: false,
   });
+  const [completed, setCompleted] = useState(0);
 
   return (
     <div className='section' key={site}>
       <h2>{site}</h2>
       <div className='lower-section'>
-        <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase }} />
+        <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase, setCompleted }} />
       </div>
-      <DisplayImages props={{files: base.imgs, setOpen}} />
+      {completed === 0 && <DisplayImages props={{files: base.imgs, setOpen}} />}
+      {completed !== 0 && <LinearProgress variant="determinate" value={completed} />}
       <ImgModal props={{ setOpen, open }} />
     </div>
   )

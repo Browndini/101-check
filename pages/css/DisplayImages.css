@@ -9,11 +9,15 @@
   align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
-  /* overflow-y: scroll; */
 }
+
 .imgItems {
   width: 150px;
   height: 150px;
   background-size: cover;
   margin: 10px 10px;
+}
+
+.img {
+  max-width: 44vw;
 }

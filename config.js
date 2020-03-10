@@ -1,5 +1,8 @@
 import { experiences, siteTests } from './api/create/img-config';
 
+
+import * as path from 'path';
+const keyFilename = path.join(__dirname, './api/config.json');
 const environment = process.env.ENVIRONMENT || 'development';
 
 export const env = {
@@ -17,4 +20,4 @@ export const env = {
 
 export const configGetter = () => env[environment];
 
-export const config = { ...configGetter(), experiences, siteTests };
+export const config = { ...configGetter(), experiences, siteTests, keyFilename };

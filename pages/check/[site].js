@@ -6,6 +6,10 @@ import DisplaySection from '../DisplaySection';
 import '../css/Home.css';
 import { config } from '../../config';
 
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+
 const base = {
   imgs: [],
   generating: '',
@@ -22,6 +26,17 @@ const sites = Object.keys(siteFiles);
 
 const Index = props => {
   const { imgs, site } = props;
+
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return ([
     <Head key="title">
@@ -41,6 +56,22 @@ const Index = props => {
             <ul className="nav-dropdown">
               {sites.map((site, index) => <li key={site} ><Link href={`/check/${site}`} ><a>{site}</a></Link></li>)}
             </ul>
+            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+              {site}
+            </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              {sites.map((site, index) => <MenuItem key={`menu-${site}`}
+                onClick={() => {
+                  handleClose();
+                  document.location.href=`/check/${site}`;
+                }}>{site}</MenuItem>)}
+            </Menu>
           </li>
         </ul>
       </nav>
