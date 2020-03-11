@@ -24,10 +24,7 @@ Object.keys(config.siteTests).forEach((exp) => {
 
 const sites = Object.keys(siteFiles);
 
-const Index = props => {
-  const { imgs, site } = props;
-
-
+const Index = ({ imgs, site }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleClick = event => {
@@ -87,15 +84,15 @@ const Index = props => {
 
 const fetchImages = async (site) => {
   const response = await fetch(`${config.fetchImages}/check-1/${site}`);
-  const myJson = await response.json();
+  const myJson = response.json();
   let imgs = (myJson.files.length >= 0) ? myJson.files : [];
-
   return { imgs, site };
 };
 
 Index.getInitialProps = async (context) => {
   const { site } = context.query;
-  return await fetchImages(site);
+  let imgs = [];
+  return { site, imgs, ...await fetchImages(site)};
 }
 
 export default Index;

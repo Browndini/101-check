@@ -16,7 +16,7 @@ export const getImg = async (req, res) => {
       const imgInfo = { src, fullName, layout, device, size };
       const vals = pick(imgData.metadata.metadata, ['layoutUrl', 'genUrl', ...[ 'site', 'device', 'size', 'layout', 'dev']]);
       const obj = { ...imgInfo, ...vals };
-      console.log({ obj });
+      // console.log({ obj });
       return obj;
     }) || [];
     res.set('Access-Control-Allow-Origin', "*");

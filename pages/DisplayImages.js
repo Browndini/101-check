@@ -22,6 +22,8 @@ const bounce = (genning) => genning && <span>&nbsp;&nbsp;<span className="c c-1"
 const DisplayImages = ({ files, site, setOpen, generating, doneGenerating, generateImages, setGenerating, setDoneGenerating, setCompleted }) => {
   const genning = ((generating === site) || (doneGenerating === site && generating === 'done'));
   // const disabled = genning ? { "pointerEvents": "none" } : {};
+
+  files = files || [];
   const prod = files.filter((i) => !i.src.match(/dev/));
   const dev = files.filter((i) => i.src.match(/dev/));
 
