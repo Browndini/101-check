@@ -13,27 +13,32 @@ const { siteTests } = require('../api/create/img-config');
 
 // temporary disabled cloud functions because they take to long
 // for cloud functions
-  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase, dev, setCompleted) => {
-    const siteKeys = Object.keys(siteTests[site]);
-    setGenerating(site);
+  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase, dev, setCompleted, url) => {
     let ss = [];
-    // ['large'].forEach(size => {
-      // [siteKeys[0]].forEach(layout => {
-    ['large', 'small', 'medium'].forEach(size => {
-      siteKeys.forEach(layout => {
-        ['mobile', 'desktop'].forEach(device => {
-          if ( size === 'small' && device === 'mobile') {
-            ss.push(`${config.generateImages}/${site}/${device}/iphone/${layout}${dev ? '/dev' : ''}`);
-          } else if (device !== 'mobile') {
-            ss.push(`${config.generateImages}/${site}/${device}/${size}/${layout}${dev ? '/dev' : ''}`);
-          }
+
+    if (url) { // just make one
+      ss = [`${config.generateImages}${url}`];
+    } else {
+      const siteKeys = Object.keys(siteTests[site]);
+      setGenerating(site);
+      // ['large'].forEach(size => {
+        // [siteKeys[0]].forEach(layout => {
+      ['large', 'small', 'medium'].forEach(size => {
+        siteKeys.forEach(layout => {
+          ['mobile', 'desktop'].forEach(device => {
+            if ( size === 'small' && device === 'mobile') {
+              ss.push(`${config.generateImages}/${site}/${device}/iphone/${layout}${dev ? '/dev' : ''}`);
+            } else if (device !== 'mobile') {
+              ss.push(`${config.generateImages}/${site}/${device}/${size}/${layout}${dev ? '/dev' : ''}`);
+            }
+          });
         });
       });
-    });
+    }
 
     setCompleted(1);
 
-    let final = false;
+    // let final = false;
     const results = [];
     let done = 0;
     mapLimit(ss, 4, async (item) => {
@@ -50,7 +55,7 @@ const { siteTests } = require('../api/create/img-config');
         .then(data => {
           let m = data.findIndex(s => s.done === false);
           if (m >= 0) {
-            final = data[m];
+            // final = data[m];
           }
         }).catch(e => {
           console.error('woooo',e);
@@ -86,7 +91,7 @@ const DisplaySection = ({ props }) => {
       <div className='lower-section'>
         <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase, setCompleted }} />
       </div>
-      {completed === 0 && <DisplayImages props={{files: base.imgs, setOpen}} />}
+      {completed === 0 && <DisplayImages props={{files: base.imgs, site, setOpen, doneGenerating, generating, setGenerating, setDoneGenerating, generateImages, setCompleted}} />}
       {completed !== 0 && <LinearProgress variant="determinate" value={completed} />}
       <ImgModal props={{ setOpen, open }} />
     </div>

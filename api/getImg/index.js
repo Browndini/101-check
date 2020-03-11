@@ -14,7 +14,7 @@ export const getImg = async (req, res) => {
       const [layout, device, size] = fullName.split('-');
       const src = imgData.metadata.mediaLink;
       const imgInfo = { src, fullName, layout, device, size };
-      const vals = pick(imgData.metadata.metadata, ['layoutUrl', ...[ 'site', 'device', 'size', 'layout', 'dev']]);
+      const vals = pick(imgData.metadata.metadata, ['layoutUrl', 'genUrl', ...[ 'site', 'device', 'size', 'layout', 'dev']]);
       const obj = { ...imgInfo, ...vals };
       console.log({ obj });
       return obj;

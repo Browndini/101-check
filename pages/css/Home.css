@@ -234,7 +234,13 @@ nav ul li ul li a {
   .nav-list {
     display: block !important;
   }
+
 }
+
+li button {
+  top: 18px;
+}
+
 #nav-toggle {
   position: absolute;
   left: 18px;
@@ -242,6 +248,7 @@ nav ul li ul li a {
   cursor: pointer;
   padding: 10px 35px 16px 0px;
 }
+
 #nav-toggle span,
 #nav-toggle span:before,
 #nav-toggle span:after {

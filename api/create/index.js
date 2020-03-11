@@ -25,7 +25,7 @@ let browser;
 export const siteCheck = async (req, res) => {
 
   if (!browser) {
-    browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
+    browser = await puppeteer.launch({ headless: false, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
   }
   const data = req.params;
 
@@ -85,7 +85,7 @@ async function check(requestInfo) {
       // }
     }
 
-    await page.waitFor(5000);
+    await page.waitFor(10000);
 
     // show boxes where ads were rendered
     // problem: doesn't show the squares as transparent but they should be
@@ -120,7 +120,8 @@ async function check(requestInfo) {
     const metadata = {
       metadata: {
         layoutUrl,
-        ...requestInfo
+        ...requestInfo,
+        genUrl: `/${site}/${device}/${size}/${layout}/${dev ? 'dev' : ''}`
       }
     };
 
