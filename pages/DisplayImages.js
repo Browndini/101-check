@@ -19,9 +19,9 @@ const chipStyles = { float:'left', margin: '5px' };
 
 const bounce = (genning) => genning && <span>&nbsp;&nbsp;<span className="c c-1">.</span><span className="c c-2">.</span><span className="c c-3">.</span></span>;
 
-const DisplayImages = ({ props: { files, site, setOpen, generating, doneGenerating, generateImages, setGenerating, setDoneGenerating, setCompleted } }) => {
+const DisplayImages = ({ files, site, setOpen, generating, doneGenerating, generateImages, setGenerating, setDoneGenerating, setCompleted }) => {
   const genning = ((generating === site) || (doneGenerating === site && generating === 'done'));
-  const disabled = genning ? { "pointerEvents": "none" } : {};
+  // const disabled = genning ? { "pointerEvents": "none" } : {};
   const prod = files.filter((i) => !i.src.match(/dev/));
   const dev = files.filter((i) => i.src.match(/dev/));
 

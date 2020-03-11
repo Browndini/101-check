@@ -2,11 +2,9 @@ import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
-const GenButton = (data) => {
-  const { generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase, setCompleted } = data.props;
+const GenButton = ({ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase, setCompleted }) => {
   const genning = ((generating === site) || (doneGenerating === site && generating === 'done'));
   const disabled = genning ? { "pointerEvents": "none" } : {};
-
   return (
 
     <Grid container spacing={3}>

@@ -13,7 +13,7 @@ const { siteTests } = require('../api/create/img-config');
 
 // temporary disabled cloud functions because they take to long
 // for cloud functions
-  const generateImages = async (site, setGenerating, setDoneGenerating, base, setBase, dev, setCompleted, url) => {
+  const generateImages = async (site = 'tb', setGenerating, setDoneGenerating, base, setBase, dev, setCompleted, url) => {
     let ss = [];
 
     if (url) { // just make one
@@ -73,13 +73,12 @@ const { siteTests } = require('../api/create/img-config');
     });
   }
 
-const DisplaySection = ({ props }) => {
-  const { site, imgs } = props;
+const DisplaySection = ({ site, imgs }) => {
   const [ generating, setGenerating ] = useState('');
   const [ doneGenerating, setDoneGenerating ] = useState(false);
   const [ open, setOpen ] = useState(false);
   const [ base, setBase ] = useState({
-    imgs,
+    imgs: imgs || [],
     generating: '',
     doneGenerating: false,
   });
@@ -88,12 +87,14 @@ const DisplaySection = ({ props }) => {
   return (
     <div className='section' key={site}>
       <h2>{site}</h2>
+      <h2>{site}</h2>
       <div className='lower-section'>
-        <GenButton props={{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase, setCompleted }} />
+        <GenButton {...{ generating, site, doneGenerating, generateImages, setGenerating, setDoneGenerating, base, setBase, setCompleted }} />
       </div>
-      {completed === 0 && <DisplayImages props={{files: base.imgs, site, setOpen, doneGenerating, generating, setGenerating, setDoneGenerating, generateImages, setCompleted}} />}
+      {completed === 0 && <DisplayImages
+        {...{ files: base.imgs, site, setOpen, doneGenerating, generating, setGenerating, setDoneGenerating, generateImages, setCompleted } } />}
       {completed !== 0 && <LinearProgress variant="determinate" value={completed} />}
-      <ImgModal props={{ setOpen, open }} />
+      <ImgModal {...{ setOpen, open }} />
     </div>
   )
 };

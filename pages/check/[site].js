@@ -80,7 +80,7 @@ const Index = props => {
       </div>
     </section>,
     <section key="content" className="home-container">
-      <DisplaySection props={{ site, imgs }} />
+      <DisplaySection {...{ site, imgs }} />
     </section>
   ]);
 }

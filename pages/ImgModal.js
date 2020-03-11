@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '@material-ui/core/Modal';
 
-const ImgModal = ({ props: { setOpen, open } }) => {
+const ImgModal = ({ setOpen, open }) => {
   return (
     <Modal
       aria-labelledby="spring-modal-title"
