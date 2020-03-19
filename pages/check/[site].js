@@ -84,7 +84,7 @@ const Index = ({ imgs, site }) => {
 
 const fetchImages = async (site) => {
   const response = await fetch(`${config.fetchImages}/check-1/${site}`);
-  const myJson = response.json();
+  const myJson = await response.json();
   let imgs = (myJson.files.length >= 0) ? myJson.files : [];
   return { imgs, site };
 };
@@ -92,7 +92,8 @@ const fetchImages = async (site) => {
 Index.getInitialProps = async (context) => {
   const { site } = context.query;
   let imgs = [];
-  return { site, imgs, ...await fetchImages(site)};
+  const obj = { site, imgs };
+  return {...obj, ...await fetchImages(site) };
 }
 
 export default Index;

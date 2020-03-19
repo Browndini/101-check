@@ -25,7 +25,7 @@ let browser;
 export const siteCheck = async (req, res) => {
 
   if (!browser) {
-    browser = await puppeteer.launch({ headless: false, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
+    browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true, args: ['--no-sandbox', '--disable-setuid-sandbox']})
   }
   const data = req.params;
 
