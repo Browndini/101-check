@@ -4,15 +4,16 @@ body {
   margin:0px;
 }
 
-.home-container { 
+.home-container {
   display: flex;
   flex-grow: 1;
   width: 100vw;
   height: 100vh;
   justify-content: center;
+  margin: 25px;
 }
 
-.home-tabs { 
+.home-tabs {
   border-right: solid black 1px;
   background: #94A89A;
 }
@@ -96,7 +97,7 @@ body {
   .MuiTypography-root {
     width: calc(100% - 72px);
   }
-} 
+}
 /* changes to material UI - END */
 
 /* display images page - START */
@@ -233,7 +234,13 @@ nav ul li ul li a {
   .nav-list {
     display: block !important;
   }
+
 }
+
+li button {
+  top: 18px;
+}
+
 #nav-toggle {
   position: absolute;
   left: 18px;
@@ -241,6 +248,7 @@ nav ul li ul li a {
   cursor: pointer;
   padding: 10px 35px 16px 0px;
 }
+
 #nav-toggle span,
 #nav-toggle span:before,
 #nav-toggle span:after {

@@ -1,12 +1,24 @@
+.scroller {
+  overflow-y: scroll;
+  height: calc(100vh - 300px);
+  /* display: none; */
+}
+
 .containImg {
   display: flex;
   align-items: center;
   justify-content: space-around;
   flex-wrap: wrap;
 }
+
 .imgItems {
   width: 150px;
   height: 150px;
   background-size: cover;
   margin: 10px 10px;
+}
+
+.img {
+  max-width: 44vw;
+  margin: 10px;
 }

@@ -1,39 +1,40 @@
-import React, { useState } from 'react';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import React from 'react';
 import Link from 'next/link'
 import fetch from 'isomorphic-unfetch';
 import Head from 'next/head'
 import DisplaySection from '../DisplaySection';
 import '../css/Home.css';
+import { config } from '../../config';
 
+import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Typography from '@material-ui/core/Typography';
 const base = {
   imgs: [],
   generating: '',
   doneGenerating: false,
 };
-const siteFiles = {
-  s101: base,
-  f101: base,
-  l101: base,
-  h101: base,
-  tb:   base,
-  de:   base,
-  ip:   base,
-  a101: base,
-  p101: base,
-  v101: base,
-};
-const styles = {
-  container: { "display": "flex", "flexGrow": "1", "width": "100vw", "height": "100vh" },
-  tabs: { "borderRight": "solid black 1px" , "background": "#94A89A" }
-};
+
+const siteFiles = {};
+
+Object.keys(config.siteTests).forEach((exp) => {
+  siteFiles[exp] = base;
+});
+
 const sites = Object.keys(siteFiles);
 
-const Index = props => {
-  const { imgs, site } = props;
-  const [ value, setValue ] = useState(0);  
-  
+const Index = ({ imgs, site }) => {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   return ([
     <Head key="title">
       <title>{`Looki ${site}`}</title>
@@ -42,15 +43,33 @@ const Index = props => {
     <section key="nav" className="navigation">
       <div className="nav-container">
       <div className="brand">
-        <a href="#!">Looki</a>
+        <Typography variant="h6" gutterBottom>
+                  <a href="#!">Looki</a>
+        </Typography>
       </div>
       <nav>
         <div className="nav-mobile"><a id="nav-toggle" href="#!"><span></span></a></div>
         <ul className="nav-list">
           <li>
-            <a href="#!">Sites</a>
-            <ul className="nav-dropdown">
-              {sites.map((site, index) => <li key={site} ><Link href={`/check/${site}`} ><a>{site}</a></Link></li>)}
+            <ul>
+              <li>
+              <Button aria-controls="simple-menu" variant="contained" aria-haspopup="true" onClick={handleClick}>
+                {site}
+              </Button>
+              <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                {sites.map((site, index) => <MenuItem key={`menu-${site}`}
+                  onClick={() => {
+                    handleClose();
+                    document.location.href=`/check/${site}`;
+                  }}>{site}</MenuItem>)}
+              </Menu>
+              </li>
             </ul>
           </li>
         </ul>
@@ -58,39 +77,23 @@ const Index = props => {
       </div>
     </section>,
     <section key="content" className="home-container">
-      <DisplaySection props={{site, imgs}} />
+      <DisplaySection {...{ site, imgs }} />
     </section>
   ]);
 }
 
-function TabPanel(props) {
-  const { children, value, site, ...other } = props;
-
-  return (
-    <div
-      component="div"
-      role="tabpanel"
-      id={`vertical-tabpanel-${site}`}
-      aria-labelledby={`vertical-tab-${site}`}
-      {...other}
-    >
-      <div p={3}>{children}</div>
-    </div>
-  );
-}
-
-
 const fetchImages = async (site) => {
-  const response = await fetch(`https://us-central1-novelty-1281.cloudfunctions.net/check-1/${site}`);
+  const response = await fetch(`${config.fetchImages}/check-1/${site}`);
   const myJson = await response.json();
   let imgs = (myJson.files.length >= 0) ? myJson.files : [];
-
   return { imgs, site };
 };
 
 Index.getInitialProps = async (context) => {
   const { site } = context.query;
-  return await fetchImages(site);
+  let imgs = [];
+  const obj = { site, imgs };
+  return {...obj, ...await fetchImages(site) };
 }
 
 export default Index;

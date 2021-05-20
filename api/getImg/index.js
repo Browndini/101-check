@@ -1,27 +1,27 @@
-// to test locally
-// for help https://cloud.google.com/functions/docs/functions-framework
-// make sure you have a google config file
-// add -> const keyFilename = '../config.json'
-// change to -> const storage = new Storage({ projectId, keyFilename });
-// finally run -> `npm start`
-
-const locationID = 'kb-img';
+import { config } from '../../config.js';
+import pick from 'lodash/pick';
 const projectId = 'novelty-1281';
 const { Storage } = require('@google-cloud/storage');
-const storage = new Storage({ projectId });
-const bucket = storage.bucket(locationID);
+const storage = new Storage({ projectId, keyFilename: config.keyFilename });
+const bucket = storage.bucket(config.bucket);
 
-exports.helloWorld = async (req, res) => {
-  const prefix = req.params[0].substring(1).toLowerCase();
-  const [items] = await bucket.getFiles({ prefix });
-  const files = items.map(imgData => {
-    const fullName = imgData.metadata.name.split('/')[1].split('.')[0]
-    const [ layout, device, size ] = fullName.split('-');
-    const src = imgData.metadata.mediaLink;
-
-    return { src, fullName, layout, device, size };
-  }) || [];
-
-  res.set('Access-Control-Allow-Origin', "*");
-  res.json({ files , site: prefix });
+export const getImg = async (req, res) => {
+  try {
+    const prefix = req.params.site.toLowerCase();
+    const [items] = await bucket.getFiles({prefix});
+    const files = items.map(imgData => {
+      const fullName = imgData.metadata.name.split('/')[1].split('.')[0];
+      const [layout, device, size] = fullName.split('-');
+      const src = imgData.metadata.mediaLink;
+      const imgInfo = { src, fullName, layout, device, size };
+      const vals = pick(imgData.metadata.metadata, ['layoutUrl', 'genUrl', ...[ 'site', 'device', 'size', 'layout', 'dev']]);
+      const obj = { ...imgInfo, ...vals };
+      return obj;
+    }) || [];
+    res.set('Access-Control-Allow-Origin', "*");
+    res.json({ files , site: prefix });
+  } catch(e) {
+    console.error(e);
+    res.json({});
+  }
 };
